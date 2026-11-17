@@ -60,6 +60,11 @@ function startUi(SCOPE, PANEL_HTML, PANEL_CSS, UI_CSS, VERSION) {
     sheet = root.getElementById('seSheet');
     shade = root.getElementById('seShade');
     if (!fab || !sheet) { host = null; return; }          // the site refused our markup
+    // Some sites hide every tag they do not recognise. Keep ours visible.
+    ['visibility:visible', 'opacity:1', 'display:block'].forEach(function (pair) {
+      const kv = pair.split(':');
+      host.style.setProperty(kv[0], kv[1], 'important');
+    });
     document.documentElement.appendChild(host);
 
     panel = SCOPE.ShutEyeMountPanel({

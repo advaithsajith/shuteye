@@ -10,11 +10,19 @@
  *   diagrams, formulas and scanned book pages (leave dark). Pages that are
  *   already dark are detected and left alone.
  */
-(function () {
+(function boot() {
   'use strict';
 
   const NR = globalThis.ShutEye;
   if (!NR || !NR.api || !NR.api.storage || globalThis.__shuteyeContent) return;
+
+  // Scripts that run at the very start can arrive before <html> exists. Wait for it.
+  if (!document.documentElement) {
+    new MutationObserver(function (records, observer) {
+      if (document.documentElement) { observer.disconnect(); boot(); }
+    }).observe(document, { childList: true });
+    return;
+  }
   globalThis.__shuteyeContent = true;
 
   const api = NR.api, doc = document, win = window;
@@ -197,7 +205,9 @@
 
   const LAYER = ' { display: block !important; position: fixed !important; top: -120px !important;' +
     ' bottom: -120px !important; left: 0 !important; right: 0 !important; margin: 0 !important;' +
-    ' border: 0 !important; pointer-events: none !important;';
+    ' border: 0 !important; pointer-events: none !important;' +
+    // some sites hide every tag they do not recognise; ours must stay visible
+    ' visibility: visible !important; opacity: 1 !important; transform: none !important; width: auto !important; height: auto !important;';
 
   function buildCss() {
     const R = NR.REVERSE;
@@ -229,6 +239,10 @@
         css += TONE_A + LAYER + ' z-index: 2147483646 !important; background: ' + t.screen + ' !important; mix-blend-mode: screen !important; }\n';
         css += TONE_B + LAYER + ' z-index: 2147483647 !important; background: ' + t.multiply + ' !important; mix-blend-mode: multiply !important; }\n';
       }
+      // Pop-ups and modal dialogs are drawn above the page, outside its filter,
+      // so they get the same treatment directly.
+      css += ':root:root dialog:modal { -webkit-filter: ' + filter + ' !important; filter: ' + filter + ' !important; }\n';
+      css += ':root:root :popover-open { -webkit-filter: ' + filter + ' !important; filter: ' + filter + ' !important; }\n';
       if (t) {
         // Colours are written "pre-flip": they come out as the theme accent.
         const accent = NR.css(NR.preimage(t.palette.accent, mx));
@@ -350,6 +364,15 @@
 
   function solid(c, min) { return !!c && c[3] > (min || 0.5); }
 
+  // Is this element (or something it sits in) fixed or stuck to the screen?
+  function pinned(el, root) {
+    for (let n = el, i = 0; n && n !== root && n !== doc.body && i < 14; n = n.parentElement, i++) {
+      const pos = getComputedStyle(n).position;
+      if (pos === 'fixed' || pos === 'sticky') return true;
+    }
+    return false;
+  }
+
   function detect() {
     lastDetect = Date.now();
     const root = doc.documentElement, body = doc.body;
@@ -380,7 +403,8 @@
             }
             const cs = getComputedStyle(el);
             const c = NR.parseColor(cs.backgroundColor);
-            if (solid(c, 0.9)) { found = c; break; }
+            // Cookie banners, pop-ups and sticky bars float over the page: they say nothing about its colour.
+            if (solid(c, 0.9)) { if (pinned(el, root)) continue; found = c; break; }
             if (el !== root && el !== body && cs.backgroundImage !== 'none') { found = 'media'; break; }
           }
           if (found === null) found = canvas;
@@ -680,13 +704,19 @@
 
   // Photos set as CSS backgrounds (hero banners, cards) are restored too.
   function checkBackground(el) {
+    if (el === doc.body || el === doc.documentElement) return;
     const cs = getComputedStyle(el);
+    // A big block that is already dark on a light page (a black header, a dark
+    // code box, a footer) would flip to bright white. Keep it as it is instead.
+    if (imagesMode === 'smart') {
+      const c = NR.parseColor(cs.backgroundColor);
+      if (c && c[3] > 0.9 && NR.lum(c) < 0.2 && el.offsetHeight >= 48 && el.offsetWidth >= win.innerWidth * 0.6) { mark(el, 'nat'); return; }
+    }
     const bi = cs.backgroundImage;
     if (!bi || bi === 'none' || bi.indexOf('url(') < 0) return;
-    if (el === doc.body || el === doc.documentElement) return;
     if (el.offsetWidth < 64 || el.offsetHeight < 64) return;                 // icons and sprites stay inverted
     if (cs.backgroundRepeat.indexOf('no-repeat') < 0 && /auto/.test(cs.backgroundSize)) return;   // tiled texture
-    if ((el.textContent || '').trim().length > 300) return;                  // a text container, not a picture
+    if ((el.textContent || '').trim().length > 300 || el.getElementsByTagName('*').length > 24) return;   // a container, not a picture
     const m = /url\(\s*(['"]?)(.*?)\1\s*\)/.exec(bi);
     if (!m || !m[2]) return;
     const url = m[2];

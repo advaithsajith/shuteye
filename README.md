@@ -1,8 +1,37 @@
-# ShutEye
+<p align="center">
+  <img src="docs/icon.png" width="120" alt="ShutEye: a sleeping fox">
+</p>
 
-Dark mode for every website in Safari on iPhone and iPad, in a theme you choose.
-Free, open source, and yours to change. The mascot is a fox that sleeps while
-ShutEye is on and wakes up when you switch it off.
+<h1 align="center">ShutEye</h1>
+
+<p align="center">
+  <b>Lights out for every website.</b><br>
+  Dark mode in a theme you choose, for Safari on iPhone and iPad, and for Chrome and Edge on Windows, Mac and Linux.<br>
+  Free, open source, and nothing leaves your device.
+</p>
+
+<p align="center">
+  <a href="https://advaithsajith.github.io/shuteye/"><b>Install on iPhone or iPad</b></a>
+  &nbsp;·&nbsp;
+  <a href="https://github.com/advaithsajith/shuteye/releases/latest/download/shuteye-desktop.zip"><b>Download for desktop</b></a>
+  &nbsp;·&nbsp;
+  <a href="https://advaithsajith.github.io/shuteye/reader/"><b>Dark PDF reader</b></a>
+</p>
+
+<p align="center">
+  <img src="docs/media/preview.jpg" alt="The install page by day, Wikipedia in dark mode, the ShutEye control panel, and the install page at night">
+</p>
+
+The mascot is a fox that sleeps while ShutEye is on and wakes up when you
+switch it off.
+
+## Install
+
+| Device | How | Time |
+| --- | --- | --- |
+| **iPhone, iPad** | Open the [install page](https://advaithsajith.github.io/shuteye/) in Safari and follow the four steps. Uses the free Userscripts app. | 3 minutes |
+| **Windows, Mac, Linux** (Chrome, Edge, Brave) | [Download the zip](https://github.com/advaithsajith/shuteye/releases/latest/download/shuteye-desktop.zip), unzip it, open `chrome://extensions`, turn on **Developer mode**, choose **Load unpacked**, and pick the unzipped `shuteye` folder. | 2 minutes |
+| **Safari with a Mac** | Build the real Safari extension with Xcode. See [Install with a Mac](#install-with-a-mac-real-safari-extension). | 15 minutes |
 
 ## What it does
 
