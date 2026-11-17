@@ -221,5 +221,5 @@ a few Safari-specific quirks on first install.
 
 ## Licence
 
-MIT. pdf.js is by Mozilla, under the Apache 2.0 licence
+Copyright © 2026 Advaith Sajith. Released under the MIT licence. pdf.js is by Mozilla, under the Apache 2.0 licence
 (`extension/vendor/PDFJS-LICENSE.txt`).
