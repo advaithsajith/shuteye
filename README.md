@@ -7,7 +7,7 @@
 <p align="center">
   <b>Lights out for every website.</b><br>
   Dark mode in a theme you choose, for Safari on iPhone and iPad, and for Chrome and Edge on Windows, Mac and Linux.<br>
-  Free, open source, and nothing leaves your device.
+  Free to use, and nothing leaves your device.
 </p>
 
 <p align="center">
@@ -221,5 +221,5 @@ a few Safari-specific quirks on first install.
 
 ## Licence
 
-Copyright © 2026 Advaith Sajith. Released under the MIT licence. pdf.js is by Mozilla, under the Apache 2.0 licence
+Copyright © 2026 Advaith Sajith. All rights reserved. ShutEye is free for personal use; see [LICENSE](LICENSE). pdf.js is by Mozilla, under the Apache 2.0 licence
 (`extension/vendor/PDFJS-LICENSE.txt`).
