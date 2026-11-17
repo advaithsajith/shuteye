@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#000000">
+<meta name="shuteye-site" content="./">
+<title>ShutEye</title>
+<meta name="description" content="Dark mode for every website on iPhone and iPad, in your own theme. Free and open source.">
+<link rel="icon" href="icon.png">
+<link rel="apple-touch-icon" href="icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Azeret+Mono:ital,wght@0,300;0,400;0,500;1,800;1,900&display=swap" rel="stylesheet">
+<style>
+  :root { --bg: #000; --fg: #ebe6df; --sub: #8d8a86; --line: #343230; --accent: #ff9d4d; }
+  * { box-sizing: border-box; }
+  html { background: var(--bg); }
+  body {
+    margin: 0; color: var(--fg); background: var(--bg);
+    font: 300 15px/1.65 "Azeret Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    -webkit-font-smoothing: antialiased; -webkit-text-size-adjust: 100%;
+  }
+  main { max-width: 760px; margin: 0 auto; padding: 18px 16px 64px; }
+  a { color: inherit; }
+  h1, h2, p, ol, ul { margin: 0; padding: 0; }
+
+  .loud { font-weight: 900; font-style: italic; text-transform: uppercase; letter-spacing: -0.045em; line-height: 0.98; text-wrap: balance; }
+  header { display: flex; align-items: center; gap: 10px; margin-bottom: 44px; }
+  header .mark { width: 50px; height: 43px; }
+  header .name { font-size: 20px; flex: 1; }
+  .pill { border: 1px solid var(--line); border-radius: 999px; padding: 6px 14px; font-size: 12px; white-space: nowrap; }
+
+  h1 { font-size: clamp(42px, 12.5vw, 96px); }
+  h1 em { color: var(--accent); font-style: inherit; }
+  .box { border: 1px solid var(--line); padding: 16px 18px; margin-top: 22px; }
+  .lede { font-size: 16px; }
+
+  .themes { list-style: none; display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+  .themes li { border: 1px solid; border-radius: 999px; padding: 6px 12px 6px 10px; font-size: 12px; font-weight: 500; display: flex; align-items: center; gap: 7px; text-transform: lowercase; }
+  .themes i { width: 8px; height: 8px; border-radius: 50%; display: block; }
+
+  h2 { font-size: clamp(26px, 7vw, 40px); margin: 64px 0 6px; }
+  .state { display: flex; align-items: center; gap: 10px; font-weight: 500; }
+  .state b { width: 9px; height: 9px; border-radius: 50%; background: var(--sub); flex: none; }
+  .state.on b { background: var(--accent); box-shadow: 0 0 0 4px rgba(255, 157, 77, 0.22); }
+
+  ol { list-style: none; counter-reset: step; }
+  ol > li { counter-increment: step; border: 1px solid var(--line); border-top: 0; padding: 18px 18px 20px; }
+  ol > li:first-child { border-top: 1px solid var(--line); }
+  ol > li::before { content: "0" counter(step); display: block; color: var(--sub); font-size: 12px; margin-bottom: 6px; }
+  ol h3 { margin: 0 0 6px; font-size: 19px; }
+  ol p { color: var(--fg); }
+  .path { color: var(--sub); font-size: 13px; margin-top: 8px; }
+  .go {
+    display: inline-flex; align-items: center; justify-content: center; margin-top: 14px; min-height: 52px; padding: 12px 26px;
+    border-radius: 999px; background: var(--fg); color: var(--bg); text-decoration: none; font-size: 15px;
+  }
+  .go.line { background: transparent; color: var(--fg); border: 1px solid var(--line); }
+  .go:active { opacity: 0.75; }
+  .go:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); margin-top: 12px; border-left: 1px solid var(--line); border-top: 1px solid var(--line); }
+  .grid div { border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 16px 18px; }
+  .grid b { display: block; font-weight: 900; font-style: italic; text-transform: uppercase; letter-spacing: -0.03em; margin-bottom: 4px; }
+  .grid span { color: var(--sub); font-size: 13.5px; }
+
+  footer { margin-top: 64px; color: var(--sub); font-size: 12.5px; }
+
+  .fox { width: 100%; height: 100%; overflow: visible; display: block; }
+  .fox-fur { fill: var(--accent); }
+  .fox-ear { fill: var(--bg); opacity: 0.4; }
+  .fox-cheek { fill: var(--fg); }
+  .fox-nose { fill: var(--bg); }
+  .fox-eye { display: none; }
+  .fox-lid { fill: none; stroke: var(--bg); stroke-width: 1.9; stroke-linecap: round; }
+  .fox-z { fill: none; stroke: var(--fg); stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; opacity: 0; animation: snooze 3.6s ease-in-out infinite; }
+  .fox-z2 { animation-delay: 1.2s; }
+  .fox-head { transform-origin: 24px 30px; animation: breathe 4.2s ease-in-out infinite; }
+  @keyframes breathe { 50% { transform: translateY(0.7px) scale(1.018); } }
+  @keyframes snooze { 0% { opacity: 0; transform: translate(-2px, 3px); } 35% { opacity: 0.95; } 100% { opacity: 0; transform: translate(2.5px, -4px); } }
+  @media (prefers-reduced-motion: reduce) { .fox-head, .fox-z { animation: none; } .fox-z { opacity: 0.9; } }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <span class="mark"><!--FOX--></span>
+    <span class="name loud">ShutEye</span>
+    <span class="pill">v<!--VERSION--></span>
+  </header>
+
+  <h1 class="loud">Lights out for <em>every</em> website</h1>
+  <div class="box lede">
+    Dark mode for Safari on iPhone and iPad, in a theme you choose. Photos keep their real colours.
+    Free, open source, and nothing leaves your device.
+  </div>
+  <ul class="themes" aria-label="Themes included"><!--THEMES--></ul>
+
+  <h2 class="loud">Install</h2>
+  <div class="box state" id="state"><b></b><span id="stateText">Not installed on this browser yet.</span></div>
+
+  <ol style="margin-top:22px">
+    <li>
+      <h3 class="loud">Get Userscripts</h3>
+      <p>ShutEye runs inside Userscripts, an open-source Safari extension from the App Store. Install it and open it once.</p>
+      <a class="go line loud" href="https://apps.apple.com/app/userscripts/id1463298887">Open the App Store</a>
+    </li>
+    <li>
+      <h3 class="loud">Switch it on</h3>
+      <p>Turn Userscripts on for Safari and allow it on all websites.</p>
+      <p class="path">Settings &gt; Apps &gt; Safari &gt; Extensions &gt; Userscripts &gt; Allow Extension, then All Websites &gt; Allow.<br>On iOS 17 or earlier: Settings &gt; Safari &gt; Extensions.</p>
+    </li>
+    <li>
+      <h3 class="loud">Add ShutEye</h3>
+      <p>Tap the button. When the script opens, tap the page-menu button in Safari's address bar, choose Userscripts, and tap the install prompt.</p>
+      <a class="go loud" href="shuteye.user.js">Install ShutEye</a>
+    </li>
+    <li>
+      <h3 class="loud">Meet the fox</h3>
+      <p>Reload any website. It goes dark, and a small fox sits in the corner. Tap the fox to pick a theme, tune it, or switch a site off.</p>
+      <p class="path">No fox? Hold two fingers still on the page for a second.</p>
+    </li>
+  </ol>
+
+  <h2 class="loud">Read PDFs</h2>
+  <div class="box">
+    Safari's own PDF viewer cannot be restyled, so ShutEye has a reader of its own. Open a PDF from Files and it is drawn in your theme, on this device only.
+    <br><a class="go line loud" href="reader/">Open the PDF reader</a>
+  </div>
+
+  <h2 class="loud">What you get</h2>
+  <div class="grid">
+    <div><b>15 themes</b><span>Dracula, Monokai, Nord, Tokyo Night and more, or pick your own three colours.</span></div>
+    <div><b>Smart images</b><span>Photos stay natural. Diagrams, formulas and scanned pages go dark.</span></div>
+    <div><b>Site rules</b><span>Auto, always or never for each site. Dark sites are left alone.</span></div>
+    <div><b>Motion</b><span>Blink, ripple, fade, curtain or mist when the lights go out.</span></div>
+    <div><b>Schedule</b><span>Always, with the system appearance, or between set hours.</span></div>
+    <div><b>Fine-tune</b><span>Brightness, contrast and warmth for late reading.</span></div>
+  </div>
+
+  <footer>ShutEye is MIT licensed. The PDF reader uses pdf.js by Mozilla (Apache 2.0).</footer>
+</main>
+<script>
+// The ShutEye userscript marks this page when it is installed.
+(function () {
+  var tries = 0;
+  (function check() {
+    var v = document.documentElement.getAttribute('data-shuteye-installed');
+    if (v) {
+      document.getElementById('state').classList.add('on');
+      document.getElementById('stateText').textContent = 'ShutEye ' + v + ' is installed. Tap the fox in the corner.';
+    } else if (++tries < 20) setTimeout(check, 300);
+  })();
+})();
+</script>
+</body>
+</html>

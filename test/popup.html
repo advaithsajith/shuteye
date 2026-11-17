@@ -1,0 +1,9 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<script>
+// Loads the real popup with the test shim in front of it.
+fetch('../extension/popup.html').then(function (r) { return r.text(); }).then(function (html) {
+  html = html.replace('<head>', '<head><base href="../extension/"><script src="../test/shim.js"><\/script>');
+  document.open(); document.write(html); document.close();
+});
+</script>

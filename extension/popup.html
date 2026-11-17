@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>ShutEye</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <header class="top">
+    <!-- The mascot: a fox that sleeps while ShutEye is on and wakes when it is off. Drawn by popup.js in the theme's colours. -->
+    <span class="mascot" id="mascot"></span>
+    <div class="brand">
+      <h1>ShutEye</h1>
+      <p id="tagline">Lights out for every website</p>
+    </div>
+    <label class="switch" title="Turn ShutEye on or off">
+      <input type="checkbox" id="enabled" aria-label="ShutEye on">
+      <span class="track"><span class="thumb"></span></span>
+    </label>
+  </header>
+
+  <section class="card site" id="siteCard">
+    <div class="site-head">
+      <span class="dot" id="siteDot"></span>
+      <div class="site-text">
+        <div class="site-host" id="siteHost">This page</div>
+        <div class="sub" id="siteStatus">Checking…</div>
+      </div>
+    </div>
+    <div id="siteControls">
+      <div class="field" id="scopeField" hidden>
+        <span class="label">Applies to</span>
+        <div class="seg" id="siteScope" role="group" aria-label="What the rule applies to">
+          <button type="button" data-v="site">Whole site</button>
+          <button type="button" data-v="section" id="scopeSection">Section</button>
+        </div>
+      </div>
+      <div class="field">
+        <span class="label">This site</span>
+        <div class="seg" id="siteMode" role="group" aria-label="Dark mode on this site">
+          <button type="button" data-v="auto">Auto</button>
+          <button type="button" data-v="on">Always</button>
+          <button type="button" data-v="off">Never</button>
+        </div>
+      </div>
+      <div class="field">
+        <span class="label">Images here</span>
+        <div class="seg" id="siteImages" role="group" aria-label="Images on this site">
+          <button type="button" data-v="default">Smart</button>
+          <button type="button" data-v="natural">Natural</button>
+          <button type="button" data-v="invert">Darken</button>
+        </div>
+      </div>
+    </div>
+    <button type="button" class="cta" id="pdfBtn" hidden>Open this PDF in the dark reader</button>
+  </section>
+
+  <section class="card">
+    <div class="card-head">
+      <h2>Theme</h2>
+      <span class="sub" id="themeName"></span>
+    </div>
+    <div class="themes" id="themes" role="group" aria-label="Theme"></div>
+    <div class="custom" id="customBox" hidden>
+      <label><input type="color" id="cBg"><span>Background</span></label>
+      <label><input type="color" id="cFg"><span>Text</span></label>
+      <label><input type="color" id="cAccent"><span>Accent</span></label>
+    </div>
+  </section>
+
+  <details class="card" id="tuneCard">
+    <summary><h2>Fine-tune</h2><span class="sub" id="tuneSummary"></span></summary>
+    <div class="slider">
+      <div class="slider-top"><label for="brightness">Brightness</label><output id="brightnessOut"></output></div>
+      <input type="range" id="brightness" min="50" max="120" step="1">
+    </div>
+    <div class="slider">
+      <div class="slider-top"><label for="contrast">Contrast</label><output id="contrastOut"></output></div>
+      <input type="range" id="contrast" min="60" max="130" step="1">
+    </div>
+    <div class="slider">
+      <div class="slider-top"><label for="sepia">Warmth</label><output id="sepiaOut"></output></div>
+      <input type="range" id="sepia" min="0" max="80" step="1">
+    </div>
+    <div class="slider">
+      <div class="slider-top"><label for="imageDim">Photo brightness</label><output id="imageDimOut"></output></div>
+      <input type="range" id="imageDim" min="30" max="100" step="1">
+    </div>
+    <label class="row"><span>Colour tint<small>Off gives a neutral gray version of the theme</small></span>
+      <span class="switch small"><input type="checkbox" id="tint"><span class="track"><span class="thumb"></span></span></span></label>
+    <label class="row"><span>Accent-coloured links<small>Paint links in the theme's accent</small></span>
+      <span class="switch small"><input type="checkbox" id="accentLinks"><span class="track"><span class="thumb"></span></span></span></label>
+    <div class="field">
+      <span class="label">Images everywhere</span>
+      <div class="seg" id="images" role="group" aria-label="Images on all sites">
+        <button type="button" data-v="smart">Smart</button>
+        <button type="button" data-v="natural">Natural</button>
+        <button type="button" data-v="invert">Darken</button>
+      </div>
+    </div>
+    <button type="button" class="link" id="resetTune">Reset fine-tuning</button>
+  </details>
+
+  <details class="card" id="motionCard">
+    <summary><h2>Motion</h2><span class="sub" id="motionSummary"></span></summary>
+    <div class="seg wrap" id="anim" role="group" aria-label="Switch animation"></div>
+    <div class="slider">
+      <div class="slider-top"><label for="animMs">Speed</label><output id="animMsOut"></output></div>
+      <input type="range" id="animMs" min="150" max="1500" step="50">
+    </div>
+    <button type="button" class="demo" id="demo" aria-label="Replay the animation">
+      <span class="demo-page demo-light" id="demoLight"><b>Aa</b><i></i><i></i><i></i></span>
+      <span class="demo-page demo-dark" id="demoDark"><b>Aa</b><i></i><i></i><i></i></span>
+      <span class="demo-hint">Tap to replay</span>
+    </button>
+  </details>
+
+  <details class="card" id="scheduleCard">
+    <summary><h2>Schedule</h2><span class="sub" id="scheduleSummary"></span></summary>
+    <div class="seg" id="schedule" role="group" aria-label="When ShutEye runs">
+      <button type="button" data-v="always">Always</button>
+      <button type="button" data-v="system">With system</button>
+      <button type="button" data-v="time">Set hours</button>
+    </div>
+    <p class="hint" id="scheduleHint"></p>
+    <div class="times" id="times" hidden>
+      <label>From <input type="time" id="timeFrom"></label>
+      <label>Until <input type="time" id="timeTo"></label>
+    </div>
+  </details>
+
+  <details class="card" id="sitesCard">
+    <summary><h2>Sites</h2><span class="sub" id="sitesSummary"></span></summary>
+    <label class="row"><span>Skip sites that are already dark<small>ShutEye checks each page's own colours</small></span>
+      <span class="switch small"><input type="checkbox" id="autoDetect"><span class="track"><span class="thumb"></span></span></span></label>
+    <label class="row"><span>Only darken sites I pick<small>Everything else stays untouched until set to Always</small></span>
+      <span class="switch small"><input type="checkbox" id="listedOnly"><span class="track"><span class="thumb"></span></span></span></label>
+    <ul class="rules" id="rules"></ul>
+    <p class="hint" id="rulesEmpty">No site rules yet. Use "This site" above to add one.</p>
+  </details>
+
+  <button type="button" class="ghost" id="readerBtn">Open the dark PDF reader</button>
+
+  <footer>ShutEye is free and open source. Nothing leaves your device.</footer>
+
+  <script src="shared.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>

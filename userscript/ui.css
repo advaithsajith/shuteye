@@ -1,0 +1,53 @@
+/* ShutEye userscript — the fox button and the sheet that holds the control panel. */
+:host {
+  all: initial;
+  /* Covers the screen but lets touches through. (The page filter makes this box the
+     reference for everything inside it, so it has to be full size.) */
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 2147483645; pointer-events: none;
+  --bg: #000000; --fg: #ebe6df; --accent: #ff9d4d; --on-accent: #141414;
+  --card: #101010; --line: #2a2928; --sub: #8d8a86; --ease: cubic-bezier(0.4, 0, 0.2, 1);
+}
+@media print { :host { display: none; } }
+[hidden] { display: none !important; }
+
+.se-fab, .se-shade, .se-sheet { pointer-events: auto; }
+
+.se-fab {
+  position: absolute; right: 12px; bottom: calc(22px + env(safe-area-inset-bottom, 0px));
+  width: 46px; height: 46px; padding: 8px 5px 5px 7px; margin: 0;
+  border: 1px solid var(--line); border-radius: 50%; background: var(--bg);
+  opacity: 0.78; cursor: pointer; box-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
+  transition: transform 0.3s var(--ease), opacity 0.3s var(--ease);
+  -webkit-tap-highlight-color: transparent;
+}
+.se-fab:active { transform: scale(0.92); }
+.se-fab.tucked { transform: translateY(96px); opacity: 0; pointer-events: none; }
+.se-fab .fox { width: 100%; height: 100%; }
+.se-fab .fox-head, .se-fab .fox-z { animation: none; }
+.se-fab .fox-zz { display: none; }
+
+.se-shade { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.45); }
+
+.se-sheet {
+  position: absolute; left: 0; right: 0; bottom: 0; max-height: 86vh; overflow-y: auto;
+  overscroll-behavior: contain; -webkit-overflow-scrolling: touch;
+  background: var(--bg); border-top: 1px solid var(--line); border-radius: 16px 16px 0 0;
+  box-shadow: 0 -10px 44px rgba(0, 0, 0, 0.55);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  animation: se-rise 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  transition: background-color 0.45s var(--ease);
+}
+@media (min-width: 620px) {
+  .se-sheet { left: auto; right: 16px; bottom: 16px; width: 412px; border: 1px solid var(--line); border-radius: 16px; }
+}
+@keyframes se-rise { from { transform: translateY(40px); opacity: 0; } }
+
+.se-top { position: sticky; top: 0; z-index: 5; display: flex; justify-content: flex-end; padding: 8px 10px 0; pointer-events: none; }
+.se-close {
+  pointer-events: auto; border: 1px solid var(--line); border-radius: 999px; background: var(--bg); color: var(--fg);
+  font: italic 800 12px ui-monospace, "SF Mono", Menlo, Consolas, monospace; text-transform: uppercase;
+  padding: 7px 14px; min-height: 34px; cursor: pointer;
+}
+.se-wrap { width: auto; padding-top: 4px; }
+
+@media (prefers-reduced-motion: reduce) { .se-sheet { animation: none; } }

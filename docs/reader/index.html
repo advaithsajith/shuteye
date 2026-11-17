@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <meta name="shuteye-site" content="../">
+  <title>ShutEye Reader</title>
+  <link rel="stylesheet" href="reader.css">
+</head>
+<body>
+  <header id="bar">
+    <span class="mascot" data-fox></span>
+    <div id="title">ShutEye Reader</div>
+    <div class="tools" id="tools" hidden>
+      <button type="button" id="zoomOut" aria-label="Zoom out">−</button>
+      <button type="button" id="zoomIn" aria-label="Zoom in">+</button>
+      <button type="button" id="pageBtn" aria-label="Go to page">1 / 1</button>
+      <button type="button" id="darkBtn" aria-pressed="true">Dark</button>
+      <button type="button" id="photoBtn" aria-pressed="true" title="Keep photos in their real colours">Photos</button>
+    </div>
+    <button type="button" id="openBtn">Open</button>
+  </header>
+
+  <div id="progress" hidden><span></span></div>
+
+  <main id="pages"></main>
+
+  <section id="empty">
+    <span class="mascot big" data-fox></span>
+    <h1>Read any PDF in your theme</h1>
+    <p id="message">Pick a PDF from your device, or paste a link to one.</p>
+    <button type="button" class="cta" id="pickBtn">Choose a PDF</button>
+    <form id="urlForm">
+      <input type="url" id="url" placeholder="https://example.com/book.pdf" inputmode="url" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="Link to a PDF">
+      <button type="submit">Open link</button>
+    </form>
+    <p class="hint">Files are opened on this device only. Nothing is uploaded.</p>
+  </section>
+
+  <input type="file" id="file" accept="application/pdf,.pdf" hidden>
+
+  <script src="web-api.js"></script>
+  <script src="shared.js"></script>
+  <script src="vendor/pdf.min.js"></script>
+  <script src="reader.js"></script>
+</body>
+</html>

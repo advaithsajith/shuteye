@@ -1,0 +1,8 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<script>
+fetch('../extension/reader.html').then(function (r) { return r.text(); }).then(function (html) {
+  html = html.replace('<head>', '<head><base href="../extension/"><script src="../test/shim.js"><\/script>');
+  document.open(); document.write(html); document.close();
+});
+</script>
