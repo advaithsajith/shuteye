@@ -71,6 +71,8 @@
   /* ---------- Deciding ---------- */
 
   function decide() {
+    // ShutEye's own pages (install page, web reader) style themselves.
+    if (doc.documentElement.hasAttribute('data-shuteye-own')) return 'off-dark';
     if (!cfg.enabled) return 'off-global';
     if (!NR.scheduleOn(cfg, new Date(), sysDark.matches)) return 'off-schedule';
     const rule = NR.siteRule(cfg, siteHost, sitePath());

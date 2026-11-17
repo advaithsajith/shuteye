@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-shuteye-own>
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="dark">
-<meta name="theme-color" content="#000000">
+<meta name="theme-color" content="#2c4be3">
 <meta name="shuteye-site" content="./">
 <title>ShutEye</title>
 <meta name="description" content="Dark mode for every website on iPhone and iPad, in your own theme. Free and open source.">
@@ -14,76 +14,189 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Azeret+Mono:ital,wght@0,300;0,400;0,500;1,800;1,900&display=swap" rel="stylesheet">
 <style>
-  :root { --bg: #000; --fg: #ebe6df; --sub: #8d8a86; --line: #343230; --accent: #ff9d4d; }
-  * { box-sizing: border-box; }
-  html { background: var(--bg); }
-  body {
-    margin: 0; color: var(--fg); background: var(--bg);
-    font: 300 15px/1.65 "Azeret Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
-    -webkit-font-smoothing: antialiased; -webkit-text-size-adjust: 100%;
+  /*
+   * The page is one small world: a fox walks along the hills at the bottom of
+   * the screen as you scroll, while day turns to night behind the text.
+   * Colours that change with the time of day are set by the script as --sky,
+   * --hill-1..3 and so on. Everything else is fixed here.
+   */
+  :root {
+    --cream: #f3ead9; --ink: #141a4a; --fox: #ff8a3d; --fox-dark: #2a1d3a;
+    --pink: #ff6b9d; --teal: #2fd3b8; --sun: #ffd76a; --lilac: #b9a4ff;
+    --sky: #2c4be3; --hill-1: #8fa2ff; --hill-2: #d9cfee; --hill-3: #f3ead9; --line: #141a4a;
+    --card: #f3ead9; --card-ink: #141a4a; --card-sub: #5b5f86; --card-line: #141a4a;
+    --ground: 118px;
   }
-  main { max-width: 760px; margin: 0 auto; padding: 18px 16px 64px; }
-  a { color: inherit; }
-  h1, h2, p, ol, ul { margin: 0; padding: 0; }
+  body.night { --card: #14142b; --card-ink: #f3ead9; --card-sub: #a6a3c4; --card-line: #f3ead9; }
 
+  * { box-sizing: border-box; }
+  html { background: var(--sky); }
+  body {
+    margin: 0; color: var(--cream);
+    font: 400 15px/1.65 "Azeret Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    -webkit-font-smoothing: antialiased; -webkit-text-size-adjust: 100%;
+    overflow-x: hidden;
+  }
+  a { color: inherit; }
+  h1, h2, h3, p, ol, ul { margin: 0; padding: 0; }
   .loud { font-weight: 900; font-style: italic; text-transform: uppercase; letter-spacing: -0.045em; line-height: 0.98; text-wrap: balance; }
-  header { display: flex; align-items: center; gap: 10px; margin-bottom: 44px; }
+
+  /* ---------- The world behind the page ---------- */
+
+  .world { position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 0; overflow: hidden; pointer-events: none; background: var(--sky); }
+  .stars { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: var(--night, 0); }
+  .stars circle { fill: var(--cream); animation: twinkle 3.4s ease-in-out infinite; }
+  .orb { position: absolute; border-radius: 50%; border: 2.5px solid var(--ink); will-change: transform; }
+  .sun { width: 124px; height: 124px; right: 9%; top: 11%; background: var(--sun); }
+  .moon { width: 92px; height: 92px; left: 12%; top: 100%; background: var(--cream); overflow: hidden; }
+  .moon::after { content: ""; position: absolute; width: 100%; height: 100%; left: 30%; top: -14%; border-radius: 50%; background: var(--sky); border: 2.5px solid var(--ink); }
+
+  /* soft shapes that drift and slowly change form */
+  .blob { position: absolute; opacity: calc(0.55 - var(--night, 0) * 0.3); will-change: transform, border-radius; animation: morph 16s ease-in-out infinite alternate; }
+  .blob.a { width: 46vmax; height: 40vmax; left: -16vmax; top: 18%; background: var(--pink); }
+  .blob.b { width: 38vmax; height: 36vmax; right: -14vmax; top: 46%; background: var(--teal); animation-duration: 21s; animation-delay: -6s; }
+  .blob.c { width: 26vmax; height: 26vmax; left: 30%; top: -9vmax; background: var(--lilac); animation-duration: 18s; animation-delay: -11s; }
+  @keyframes morph {
+    0% { border-radius: 58% 42% 55% 45% / 46% 60% 40% 54%; }
+    50% { border-radius: 40% 60% 38% 62% / 62% 38% 60% 40%; }
+    100% { border-radius: 62% 38% 48% 52% / 40% 55% 45% 60%; }
+  }
+  @keyframes twinkle { 50% { opacity: 0.25; } }
+
+  /* the strip of hills at the bottom, in front of the text */
+  .ground { position: fixed; left: 0; right: 0; bottom: 0; height: var(--ground); z-index: 3; pointer-events: none; }
+  .ground svg.hills { position: absolute; left: 0; bottom: 0; width: 100%; height: 100%; overflow: visible; }
+  .hills path { stroke: var(--line); stroke-width: 2.5; vector-effect: non-scaling-stroke; }
+  #hill1 { fill: var(--hill-1); } #hill2 { fill: var(--hill-2); } #hill3 { fill: var(--hill-3); }
+
+  /* ---------- The fox ---------- */
+
+  .fox-run { position: absolute; left: 0; bottom: 0; width: 104px; height: 73px; will-change: transform; }
+  .fox-run svg { position: absolute; left: 0; top: 0; width: 100%; height: 100%; overflow: visible; }
+  .fox-run .flip { width: 100%; height: 100%; transition: transform 0.25s; }
+  .fox-run.left .flip { transform: scaleX(-1); }
+  .fx { stroke: var(--ink); stroke-width: 2.2; stroke-linejoin: round; stroke-linecap: round; }
+  .fx-fur { fill: var(--fox); } .fx-cream { fill: var(--cream); } .fx-dark { fill: var(--fox-dark); } .fx-ink { fill: var(--ink); stroke: none; }
+  .fx-line { fill: none; }
+  .leg { transform-box: fill-box; transform-origin: 50% 8%; }
+  .tail { transform-box: fill-box; transform-origin: 100% 60%; animation: sway 2.6s ease-in-out infinite; }
+  .bob { transform-box: fill-box; }
+  .eye { transform-box: fill-box; transform-origin: center; animation: blink 4.6s infinite; }
+  .walking .leg.p1 { animation: step 0.42s linear infinite; }
+  .walking .leg.p2 { animation: step 0.42s linear infinite -0.21s; }
+  .walking .bob { animation: bob 0.21s ease-in-out infinite alternate; }
+  .walking .tail { animation-duration: 0.5s; }
+  @keyframes step { 0% { transform: rotate(26deg); } 50% { transform: rotate(-26deg); } 100% { transform: rotate(26deg); } }
+  @keyframes bob { to { transform: translateY(-1.6px); } }
+  @keyframes sway { 50% { transform: rotate(9deg); } }
+  @keyframes blink { 0%, 94%, 100% { transform: scaleY(1); } 97% { transform: scaleY(0.1); } }
+  .fox-run .asleep { opacity: 0; }
+  .fox-run.sleeping .awake { opacity: 0; }
+  .fox-run.sleeping .asleep { opacity: 1; }
+  .fox-run .awake, .fox-run .asleep { transition: opacity 0.35s; }
+  .zz { fill: none; stroke: var(--cream); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; opacity: 0; }
+  .sleeping .zz { animation: snooze 3.2s ease-in-out infinite; }
+  .sleeping .zz.z2 { animation-delay: 1.1s; }
+  .breath { transform-box: fill-box; transform-origin: 50% 100%; }
+  .sleeping .breath { animation: breathe 3.8s ease-in-out infinite; }
+  @keyframes breathe { 50% { transform: scaleY(1.05); } }
+  @keyframes snooze { 0% { opacity: 0; transform: translate(-3px, 4px); } 35% { opacity: 1; } 100% { opacity: 0; transform: translate(5px, -9px); } }
+
+  /* ---------- Content ---------- */
+
+  main { position: relative; z-index: 2; max-width: 760px; margin: 0 auto; padding: 18px 16px calc(var(--ground) + 90px); }
+  header { display: flex; align-items: center; gap: 10px; margin-bottom: 40px; }
   header .mark { width: 50px; height: 43px; }
   header .name { font-size: 20px; flex: 1; }
-  .pill { border: 1px solid var(--line); border-radius: 999px; padding: 6px 14px; font-size: 12px; white-space: nowrap; }
+  .pill { border: 2px solid var(--cream); border-radius: 999px; padding: 5px 14px; font-size: 12px; font-weight: 500; white-space: nowrap; }
 
-  h1 { font-size: clamp(42px, 12.5vw, 96px); }
-  h1 em { color: var(--accent); font-style: inherit; }
-  .box { border: 1px solid var(--line); padding: 16px 18px; margin-top: 22px; }
-  .lede { font-size: 16px; }
+  h1 { font-size: clamp(44px, 12.5vw, 98px); text-shadow: 3px 3px 0 var(--ink); }
+  h1 em { color: var(--sun); font-style: inherit; }
+  h2 { font-size: clamp(28px, 7.5vw, 44px); margin: 76px 0 14px; text-shadow: 2px 2px 0 var(--ink); }
 
-  .themes { list-style: none; display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
-  .themes li { border: 1px solid; border-radius: 999px; padding: 6px 12px 6px 10px; font-size: 12px; font-weight: 500; display: flex; align-items: center; gap: 7px; text-transform: lowercase; }
-  .themes i { width: 8px; height: 8px; border-radius: 50%; display: block; }
+  .card {
+    background: var(--card); color: var(--card-ink); border: 2.5px solid var(--card-line); border-radius: 28px;
+    padding: 20px 22px; box-shadow: 6px 6px 0 var(--ink);
+    transition: background-color 0.6s, color 0.6s, border-color 0.6s;
+  }
+  .lede { margin-top: 26px; font-size: 16px; }
 
-  h2 { font-size: clamp(26px, 7vw, 40px); margin: 64px 0 6px; }
-  .state { display: flex; align-items: center; gap: 10px; font-weight: 500; }
-  .state b { width: 9px; height: 9px; border-radius: 50%; background: var(--sub); flex: none; }
-  .state.on b { background: var(--accent); box-shadow: 0 0 0 4px rgba(255, 157, 77, 0.22); }
+  .themes { list-style: none; display: flex; flex-wrap: wrap; gap: 7px; margin-top: 18px; }
+  .themes li { border: 2px solid; border-radius: 999px; padding: 6px 13px 6px 10px; font-size: 12px; font-weight: 500; display: flex; align-items: center; gap: 7px; text-transform: lowercase; }
+  .themes i { width: 9px; height: 9px; border-radius: 50%; display: block; }
 
-  ol { list-style: none; counter-reset: step; }
-  ol > li { counter-increment: step; border: 1px solid var(--line); border-top: 0; padding: 18px 18px 20px; }
-  ol > li:first-child { border-top: 1px solid var(--line); }
-  ol > li::before { content: "0" counter(step); display: block; color: var(--sub); font-size: 12px; margin-bottom: 6px; }
-  ol h3 { margin: 0 0 6px; font-size: 19px; }
-  ol p { color: var(--fg); }
-  .path { color: var(--sub); font-size: 13px; margin-top: 8px; }
+  .state { display: flex; align-items: center; gap: 12px; font-weight: 500; }
+  .state b { width: 12px; height: 12px; border-radius: 50%; background: var(--card-sub); flex: none; border: 2px solid var(--card-line); }
+  .state.on b { background: var(--teal); }
+
+  ol { list-style: none; counter-reset: step; display: grid; gap: 16px; margin-top: 16px; }
+  ol > li { counter-increment: step; position: relative; padding-top: 36px; }
+  ol > li::before {
+    content: counter(step); position: absolute; top: -14px; left: 20px; width: 40px; height: 40px; border-radius: 50%;
+    display: grid; place-items: center; font-weight: 900; font-style: italic; font-size: 18px;
+    color: var(--ink); background: var(--sun); border: 2.5px solid var(--ink);
+  }
+  ol > li:nth-child(2)::before { background: var(--pink); }
+  ol > li:nth-child(3)::before { background: var(--teal); }
+  ol > li:nth-child(4)::before { background: var(--fox); }
+  ol h3 { margin: 0 0 6px; font-size: 21px; }
+  .path { color: var(--card-sub); font-size: 13px; margin-top: 8px; }
+
   .go {
     display: inline-flex; align-items: center; justify-content: center; margin-top: 14px; min-height: 52px; padding: 12px 26px;
-    border-radius: 999px; background: var(--fg); color: var(--bg); text-decoration: none; font-size: 15px;
+    border-radius: 999px; background: var(--fox); color: var(--ink); border: 2.5px solid var(--ink); box-shadow: 4px 4px 0 var(--ink);
+    text-decoration: none; font-size: 15px; transition: transform 0.12s, box-shadow 0.12s;
   }
-  .go.line { background: transparent; color: var(--fg); border: 1px solid var(--line); }
-  .go:active { opacity: 0.75; }
-  .go:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+  .go.line { background: var(--card); color: var(--card-ink); border-color: var(--card-line); }
+  .go:hover { transform: translate(-1px, -1px); box-shadow: 5px 5px 0 var(--ink); }
+  .go:active { transform: translate(3px, 3px); box-shadow: 1px 1px 0 var(--ink); }
+  .go:focus-visible, a:focus-visible { outline: 3px solid var(--sun); outline-offset: 3px; }
 
-  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); margin-top: 12px; border-left: 1px solid var(--line); border-top: 1px solid var(--line); }
-  .grid div { border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 16px 18px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 14px; }
+  .grid .card { padding: 16px 18px; border-radius: 22px; }
   .grid b { display: block; font-weight: 900; font-style: italic; text-transform: uppercase; letter-spacing: -0.03em; margin-bottom: 4px; }
-  .grid span { color: var(--sub); font-size: 13.5px; }
+  .grid span { color: var(--card-sub); font-size: 13.5px; }
+  .grid .card:nth-child(3n+1) { border-top-left-radius: 44px; }
+  .grid .card:nth-child(3n+2) { border-bottom-right-radius: 44px; }
+  .grid .card:nth-child(3n) { border-top-right-radius: 44px; }
 
-  footer { margin-top: 64px; color: var(--sub); font-size: 12.5px; }
+  .night-note { text-align: center; margin-top: 84px; font-size: clamp(30px, 9vw, 60px); text-shadow: 3px 3px 0 var(--ink); }
+  footer { margin-top: 22px; text-align: center; font-size: 12.5px; opacity: 0.8; }
 
+  /* things drift up into place as they scroll into view */
+  .rise { opacity: 0; transform: translateY(26px) rotate(-0.6deg); transition: opacity 0.6s, transform 0.7s cubic-bezier(0.2, 0.8, 0.2, 1); }
+  .rise.in { opacity: 1; transform: none; }
+
+  /* the header fox (the mascot face) */
   .fox { width: 100%; height: 100%; overflow: visible; display: block; }
-  .fox-fur { fill: var(--accent); }
-  .fox-ear { fill: var(--bg); opacity: 0.4; }
-  .fox-cheek { fill: var(--fg); }
-  .fox-nose { fill: var(--bg); }
-  .fox-eye { display: none; }
-  .fox-lid { fill: none; stroke: var(--bg); stroke-width: 1.9; stroke-linecap: round; }
-  .fox-z { fill: none; stroke: var(--fg); stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; opacity: 0; animation: snooze 3.6s ease-in-out infinite; }
+  .fox-fur { fill: var(--fox); } .fox-ear { fill: var(--ink); opacity: 0.4; } .fox-cheek { fill: var(--cream); } .fox-nose { fill: var(--ink); }
+  .fox-eye { display: none; } .fox-lid { fill: none; stroke: var(--ink); stroke-width: 1.9; stroke-linecap: round; }
+  .fox-z { fill: none; stroke: var(--cream); stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; opacity: 0; animation: snooze 3.6s ease-in-out infinite; }
   .fox-z2 { animation-delay: 1.2s; }
-  .fox-head { transform-origin: 24px 30px; animation: breathe 4.2s ease-in-out infinite; }
-  @keyframes breathe { 50% { transform: translateY(0.7px) scale(1.018); } }
-  @keyframes snooze { 0% { opacity: 0; transform: translate(-2px, 3px); } 35% { opacity: 0.95; } 100% { opacity: 0; transform: translate(2.5px, -4px); } }
-  @media (prefers-reduced-motion: reduce) { .fox-head, .fox-z { animation: none; } .fox-z { opacity: 0.9; } }
+
+  /* moving between this page and the reader */
+  @view-transition { navigation: auto; }
+  ::view-transition-old(root) { animation: leave 0.35s ease both; }
+  ::view-transition-new(root) { animation: arrive 0.55s cubic-bezier(0.3, 0.7, 0.2, 1) both; }
+  @keyframes leave { to { opacity: 0; transform: scale(0.97); } }
+  @keyframes arrive { from { clip-path: circle(0 at 50% 100%); } to { clip-path: circle(150vmax at 50% 100%); } }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+    .rise { opacity: 1; transform: none; }
+    .fox-z, .zz { opacity: 0.9; }
+  }
 </style>
 </head>
 <body>
+
+<div class="world" aria-hidden="true">
+  <svg class="stars" id="stars"></svg>
+  <div class="blob a"></div><div class="blob b"></div><div class="blob c"></div>
+  <div class="orb sun" id="sun"></div>
+  <div class="orb moon" id="moon"></div>
+</div>
+
 <main>
   <header>
     <span class="mark"><!--FOX--></span>
@@ -92,32 +205,32 @@
   </header>
 
   <h1 class="loud">Lights out for <em>every</em> website</h1>
-  <div class="box lede">
+  <div class="card lede rise">
     Dark mode for Safari on iPhone and iPad, in a theme you choose. Photos keep their real colours.
     Free, open source, and nothing leaves your device.
   </div>
-  <ul class="themes" aria-label="Themes included"><!--THEMES--></ul>
+  <ul class="themes rise" aria-label="Themes included"><!--THEMES--></ul>
 
   <h2 class="loud">Install</h2>
-  <div class="box state" id="state"><b></b><span id="stateText">Not installed on this browser yet.</span></div>
+  <div class="card state rise" id="state"><b></b><span id="stateText">Not installed on this browser yet.</span></div>
 
-  <ol style="margin-top:22px">
-    <li>
+  <ol>
+    <li class="card rise">
       <h3 class="loud">Get Userscripts</h3>
       <p>ShutEye runs inside Userscripts, an open-source Safari extension from the App Store. Install it and open it once.</p>
       <a class="go line loud" href="https://apps.apple.com/app/userscripts/id1463298887">Open the App Store</a>
     </li>
-    <li>
+    <li class="card rise">
       <h3 class="loud">Switch it on</h3>
       <p>Turn Userscripts on for Safari and allow it on all websites.</p>
       <p class="path">Settings &gt; Apps &gt; Safari &gt; Extensions &gt; Userscripts &gt; Allow Extension, then All Websites &gt; Allow.<br>On iOS 17 or earlier: Settings &gt; Safari &gt; Extensions.</p>
     </li>
-    <li>
+    <li class="card rise">
       <h3 class="loud">Add ShutEye</h3>
       <p>Tap the button. When the script opens, tap the page-menu button in Safari's address bar, choose Userscripts, and tap the install prompt.</p>
       <a class="go loud" href="shuteye.user.js">Install ShutEye</a>
     </li>
-    <li>
+    <li class="card rise">
       <h3 class="loud">Meet the fox</h3>
       <p>Reload any website. It goes dark, and a small fox sits in the corner. Tap the fox to pick a theme, tune it, or switch a site off.</p>
       <p class="path">No fox? Hold two fingers still on the page for a second.</p>
@@ -125,23 +238,69 @@
   </ol>
 
   <h2 class="loud">Read PDFs</h2>
-  <div class="box">
+  <div class="card rise">
     Safari's own PDF viewer cannot be restyled, so ShutEye has a reader of its own. Open a PDF from Files and it is drawn in your theme, on this device only.
     <br><a class="go line loud" href="reader/">Open the PDF reader</a>
   </div>
 
   <h2 class="loud">What you get</h2>
   <div class="grid">
-    <div><b>15 themes</b><span>Dracula, Monokai, Nord, Tokyo Night and more, or pick your own three colours.</span></div>
-    <div><b>Smart images</b><span>Photos stay natural. Diagrams, formulas and scanned pages go dark.</span></div>
-    <div><b>Site rules</b><span>Auto, always or never for each site. Dark sites are left alone.</span></div>
-    <div><b>Motion</b><span>Blink, ripple, fade, curtain or mist when the lights go out.</span></div>
-    <div><b>Schedule</b><span>Always, with the system appearance, or between set hours.</span></div>
-    <div><b>Fine-tune</b><span>Brightness, contrast and warmth for late reading.</span></div>
+    <div class="card rise"><b>15 themes</b><span>Dracula, Monokai, Nord, Tokyo Night and more, or pick your own three colours.</span></div>
+    <div class="card rise"><b>Smart images</b><span>Photos stay natural. Diagrams, formulas and scanned pages go dark.</span></div>
+    <div class="card rise"><b>Site rules</b><span>Auto, always or never for each site. Dark sites are left alone.</span></div>
+    <div class="card rise"><b>Motion</b><span>Blink, ripple, fade, curtain or mist when the lights go out.</span></div>
+    <div class="card rise"><b>Schedule</b><span>Always, with the system appearance, or between set hours.</span></div>
+    <div class="card rise"><b>Fine-tune</b><span>Brightness, contrast, warmth and photo dimming for late reading.</span></div>
   </div>
 
+  <p class="night-note loud rise">Goodnight.</p>
   <footer>ShutEye is MIT licensed. The PDF reader uses pdf.js by Mozilla (Apache 2.0).</footer>
 </main>
+
+<div class="ground" aria-hidden="true">
+  <svg class="hills" id="hills" preserveAspectRatio="none">
+    <path id="hill1"/><path id="hill2"/><path id="hill3"/>
+  </svg>
+  <div class="fox-run" id="fox">
+    <div class="flip">
+      <!-- awake: walks while you scroll -->
+      <svg class="awake" viewBox="0 0 120 84">
+        <g class="bob">
+          <g class="tail"><path class="fx fx-fur" d="M38 44 C24 51 6 45 4 26 C14 36 26 33 39 36 Z"/><path class="fx fx-cream" d="M4 26 C5 35 9 41 16 45 C13 39 12 33 13 31 Z"/></g>
+          <rect class="fx fx-dark leg p2" x="45" y="50" width="7" height="23" rx="3.5"/>
+          <rect class="fx fx-dark leg p1" x="76" y="50" width="7" height="23" rx="3.5"/>
+          <ellipse class="fx fx-fur" cx="58" cy="46" rx="27" ry="13"/>
+          <path class="fx fx-cream" d="M40 54 C50 61 68 61 78 54 C68 57 50 57 40 54 Z"/>
+          <rect class="fx fx-dark leg p1" x="38" y="50" width="7" height="23" rx="3.5"/>
+          <rect class="fx fx-dark leg p2" x="69" y="50" width="7" height="23" rx="3.5"/>
+          <polygon class="fx fx-fur" points="79,24 83,7 91,21"/>
+          <polygon class="fx fx-fur" points="89,22 96,8 100,24"/>
+          <path class="fx fx-fur" d="M74 35 C74 23 86 18 96 22 C102 25 106 31 114 36 C108 41 100 44 92 45 C82 46 74 43 74 35 Z"/>
+          <path class="fx fx-cream" d="M85 40 C93 38 104 37 114 36 C108 41 100 44 92 45 C88 45 86 43 85 40 Z"/>
+          <circle class="fx-ink" cx="113" cy="36" r="2.4"/>
+          <ellipse class="fx-ink eye" cx="95" cy="30" rx="1.9" ry="2.1"/>
+        </g>
+      </svg>
+      <!-- asleep: curled up at the end of the page -->
+      <svg class="asleep" viewBox="0 0 120 84">
+        <g class="breath">
+          <ellipse class="fx fx-fur" cx="56" cy="62" rx="37" ry="17"/>
+          <polygon class="fx fx-fur" points="77,49 80,35 88,46"/>
+          <polygon class="fx fx-fur" points="88,46 95,35 98,49"/>
+          <path class="fx fx-fur" d="M70 58 C70 47 82 43 92 46 C99 48 106 55 111 61 C103 66 93 68 84 67 C76 66 70 63 70 58 Z"/>
+          <path class="fx fx-cream" d="M84 63 C92 62 102 62 111 61 C103 66 93 68 84 67 Z"/>
+          <circle class="fx-ink" cx="110" cy="61" r="2.3"/>
+          <path class="fx fx-line" d="M87 55 q3.4 2.8 6.8 0"/>
+          <path class="fx fx-fur" d="M20 64 C18 82 60 84 88 73 C70 76 46 74 34 62 Z"/>
+          <path class="fx fx-cream" d="M72 77 C79 77 85 75 90 71 C89 77 82 81 72 79 Z"/>
+        </g>
+        <polyline class="zz" points="92,24 100,24 92,33 100,33"/>
+        <polyline class="zz z2" points="104,8 110,8 104,15 110,15"/>
+      </svg>
+    </div>
+  </div>
+</div>
+
 <script>
 // The ShutEye userscript marks this page when it is installed.
 (function () {
@@ -153,6 +312,114 @@
       document.getElementById('stateText').textContent = 'ShutEye ' + v + ' is installed. Tap the fox in the corner.';
     } else if (++tries < 20) setTimeout(check, 300);
   })();
+})();
+
+// The little world: scrolling is the fox's walk from afternoon into night.
+(function () {
+  var root = document.documentElement, body = document.body;
+  var fox = document.getElementById('fox'), sun = document.getElementById('sun'), moon = document.getElementById('moon');
+  var hills = document.getElementById('hills'), paths = [1, 2, 3].map(function (n) { return document.getElementById('hill' + n); });
+  var calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function hex(h) { return [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)]; }
+  // Blends through a list of [position, colour] stops.
+  function ramp(stops, p) {
+    for (var i = 1; i < stops.length; i++) {
+      if (p <= stops[i][0]) {
+        var a = stops[i - 1], b = stops[i], t = (p - a[0]) / (b[0] - a[0] || 1), ca = hex(a[1]), cb = hex(b[1]);
+        return 'rgb(' + ca.map(function (v, k) { return Math.round(v + (cb[k] - v) * t); }).join(',') + ')';
+      }
+    }
+    return stops[stops.length - 1][1];
+  }
+  var SKY = [[0, '#2c4be3'], [0.4, '#6b3fd0'], [0.62, '#c2457e'], [0.8, '#2a1b5e'], [1, '#090914']];
+  var H1 = [[0, '#8fa2ff'], [0.5, '#8a5fd6'], [0.8, '#1d1747'], [1, '#0e0e22']];
+  var H2 = [[0, '#d9cfee'], [0.5, '#f0a9b8'], [0.8, '#2b2360'], [1, '#141433']];
+  var H3 = [[0, '#f3ead9'], [0.5, '#ffd9b0'], [0.8, '#3a3180'], [1, '#1b1b45']];
+  var LINE = [[0, '#141a4a'], [0.7, '#141a4a'], [1, '#f3ead9']];
+
+  // stars
+  var stars = document.getElementById('stars'), s = '';
+  for (var i = 0; i < 46; i++) {
+    var x = (i * 61.8) % 100, y = (i * 37.3) % 78, r = 0.8 + (i % 4) * 0.45;
+    s += '<circle cx="' + x + '%" cy="' + y + '%" r="' + r + '" style="animation-delay:-' + (i % 7) * 0.5 + 's"/>';
+  }
+  stars.innerHTML = s;
+
+  // Height of a hill at x (pixels above the bottom of the strip).
+  function height(layer, x, shift) {
+    var k = [[0.0042, 0.011, 54, 14, 10], [0.0061, 0.017, 38, 11, 7], [0.008, 0.021, 22, 8, 5]][layer];
+    var u = x + shift * (0.35 + layer * 0.45);
+    return k[2] + k[3] * Math.sin(u * k[0] + layer * 2) + k[4] * Math.sin(u * k[1] + layer);
+  }
+
+  var lastY = -1, lastP = -1, walkTimer = 0, W = 0, H = 0;
+  function draw() {
+    var max = Math.max(1, root.scrollHeight - innerHeight);
+    var y = Math.max(0, Math.min(max, scrollY)), p = y / max;
+    W = innerWidth; H = hills.clientHeight || 118;
+
+    root.style.setProperty('--sky', ramp(SKY, p));
+    root.style.setProperty('--hill-1', ramp(H1, p));
+    root.style.setProperty('--hill-2', ramp(H2, p));
+    root.style.setProperty('--hill-3', ramp(H3, p));
+    root.style.setProperty('--line', ramp(LINE, p));
+    root.style.setProperty('--night', Math.max(0, Math.min(1, (p - 0.6) / 0.3)).toFixed(3));
+    body.classList.toggle('night', p > 0.66);
+    var meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute('content', ramp(SKY, p));
+
+    // the sun sets, the moon rises
+    sun.style.transform = 'translate3d(' + (-p * 60) + 'px,' + (p * 120) + 'vh,0)';
+    moon.style.transform = 'translate3d(0,' + (-Math.max(0, (p - 0.55) / 0.45) * 84) + 'vh,0)';
+
+    // hills
+    var shift = y * 0.9;
+    hills.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+    for (var l = 0; l < 3; l++) {
+      var d = 'M0 ' + H;
+      for (var x = 0; x <= W + 24; x += 24) d += ' L' + x + ' ' + (H - height(l, x, shift)).toFixed(1);
+      paths[l].setAttribute('d', d + ' L' + W + ' ' + H + ' Z');
+    }
+
+    // the fox walks across the front hill
+    var fw = fox.offsetWidth, fx = 10 + p * Math.max(0, W - fw - 20), mid = fx + fw / 2;
+    var ground = height(2, mid, shift);
+    var slope = (height(2, mid + 16, shift) - height(2, mid - 16, shift)) / 32;
+    fox.style.transform = 'translate3d(' + fx.toFixed(1) + 'px,' + (-(ground - 6)).toFixed(1) + 'px,0) rotate(' + (-Math.atan(slope) * 57.3 * 0.7).toFixed(1) + 'deg)';
+
+    var asleep = p > 0.985;
+    fox.classList.toggle('sleeping', asleep);
+    if (lastY >= 0 && Math.abs(y - lastY) > 0.5 && !asleep && !calm) {
+      fox.classList.add('walking');
+      fox.classList.toggle('left', y < lastY);
+      clearTimeout(walkTimer);
+      walkTimer = setTimeout(function () { fox.classList.remove('walking'); fox.classList.remove('left'); }, 170);
+    }
+    if (asleep) fox.classList.remove('walking', 'left');
+    lastY = y; lastP = p;
+  }
+
+  var queued = false;
+  function queue() { if (!queued) { queued = true; requestAnimationFrame(function () { queued = false; draw(); }); } }
+  addEventListener('scroll', queue, { passive: true });
+  addEventListener('resize', queue);
+  addEventListener('load', draw);
+  draw();
+
+  // things rise into place as they scroll into view
+  var rise = [].slice.call(document.querySelectorAll('.rise'));
+  function reveal() {
+    rise = rise.filter(function (el, i) {
+      if (!calm && el.getBoundingClientRect().top > innerHeight * 0.94) return true;
+      el.style.transitionDelay = (i % 3) * 70 + 'ms';
+      el.classList.add('in');
+      return false;
+    });
+  }
+  addEventListener('scroll', reveal, { passive: true });
+  addEventListener('resize', reveal);
+  reveal();
 })();
 </script>
 </body>

@@ -98,6 +98,7 @@ fs.writeFileSync(path.join(OUT, 'shuteye.user.js'), script);
 let reader = read(EXT, 'reader.html');
 must(reader, '<script src="shared.js"></script>', 'shared.js in reader.html');
 reader = reader
+  .replace('<html lang="en">', '<html lang="en" data-shuteye-own>')
   .replace('<meta name="color-scheme" content="dark">', '<meta name="color-scheme" content="dark">\n  <meta name="shuteye-site" content="../">')
   .replace('<script src="shared.js"></script>', '<script src="web-api.js"></script>\n  <script src="shared.js"></script>');
 fs.writeFileSync(path.join(OUT, 'reader', 'index.html'), reader);
