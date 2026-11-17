@@ -150,6 +150,8 @@
   .go.line { background: var(--card); color: var(--card-ink); border-color: var(--card-line); }
   .go:hover { transform: translate(-1px, -1px); box-shadow: 5px 5px 0 var(--ink); }
   .go:active { transform: translate(3px, 3px); box-shadow: 1px 1px 0 var(--ink); }
+  .help { margin-top: 14px; }
+  .help summary { cursor: pointer; font-weight: 500; text-decoration: underline; text-underline-offset: 3px; min-height: 32px; }
   .go:focus-visible, a:focus-visible { outline: 3px solid var(--sun); outline-offset: 3px; }
 
   .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 14px; }
@@ -229,6 +231,12 @@
       <h3 class="loud">Add ShutEye</h3>
       <p>Tap the button. When the script opens, tap the page-menu button in Safari's address bar, choose Userscripts, and tap the install prompt.</p>
       <a class="go loud" href="shuteye.user.js">Install ShutEye</a>
+      <details class="help">
+        <summary>No install prompt?</summary>
+        <p class="path"><b>1.</b> With the script page open, tap the page-menu button, then Userscripts. If it asks, choose Always Allow, then Always Allow on Every Website. Reload the script page and open Userscripts again.</p>
+        <p class="path"><b>2.</b> Still nothing? On the script page tap Share, then Save to Files, and save it into your Userscripts folder (keep the name ending in .user.js). Open the Userscripts menu in Safari once so it notices the file, and check ShutEye is switched on.</p>
+        <p class="path"><b>3.</b> Already have ShutEye? There is no prompt for a copy you already have. Open the Userscripts menu and use its update check instead.</p>
+      </details>
     </li>
     <li class="card rise">
       <h3 class="loud">Meet the fox</h3>

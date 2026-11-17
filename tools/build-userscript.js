@@ -52,11 +52,16 @@ panelCss = panelCss
   .replace(/^html \{[^}]*\}/m, '')
   .replace(/(^|[\s,}])body(?=[\s.{])/gm, '$1.se-wrap');   // the popup's <body> becomes the sheet's wrapper
 
+// Where the built files are published. Userscripts uses this to offer updates.
+const SITE = 'https://advaithsajith.github.io/shuteye/';
+
 const banner = `// ==UserScript==
 // @name         ShutEye
 // @description  Dark mode for every website, in your own theme. Tap the fox to change it.
 // @version      ${VERSION}
 // @match        *://*/*
+// @updateURL    ${SITE}shuteye.meta.js
+// @downloadURL  ${SITE}shuteye.user.js
 // @run-at       document-start
 // @inject-into  content
 // @grant        GM.getValue
@@ -92,6 +97,8 @@ startUi(SCOPE, ${JSON.stringify(panelHtml)}, ${JSON.stringify(panelCss)}, ${JSON
 
 fs.mkdirSync(path.join(OUT, 'reader', 'vendor'), { recursive: true });
 fs.writeFileSync(path.join(OUT, 'shuteye.user.js'), script);
+// A tiny copy of just the header: update checks read this instead of the whole script.
+fs.writeFileSync(path.join(OUT, 'shuteye.meta.js'), banner.slice(0, banner.indexOf('// ==/UserScript==') + 18) + '\n');
 
 /* ---------- The web PDF reader ---------- */
 
