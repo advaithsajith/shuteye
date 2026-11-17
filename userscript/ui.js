@@ -13,6 +13,7 @@ function startUi(SCOPE, PANEL_HTML, PANEL_CSS, UI_CSS, VERSION) {
 
   const U = SCOPE.ShutEye, api = U.api;
   let host = null, root = null, panel = null, sheet = null, shade = null, fab = null;
+  let fails = 0;
   let ui = { fab: true }, siteBase = '', isSitePage = false;
 
   // Some sites only accept HTML through a "trusted types" policy.
@@ -59,7 +60,7 @@ function startUi(SCOPE, PANEL_HTML, PANEL_CSS, UI_CSS, VERSION) {
     fab = root.getElementById('seFab');
     sheet = root.getElementById('seSheet');
     shade = root.getElementById('seShade');
-    if (!fab || !sheet) { host = null; return; }          // the site refused our markup
+    if (!fab || !sheet) { host = null; fails++; return; }          // the site refused our markup
     // Some sites hide every tag they do not recognise. Keep ours visible.
     ['visibility:visible', 'opacity:1', 'display:block'].forEach(function (pair) {
       const kv = pair.split(':');
@@ -116,7 +117,7 @@ function startUi(SCOPE, PANEL_HTML, PANEL_CSS, UI_CSS, VERSION) {
   /* ---------- Ways to open it ---------- */
 
   // The fox ducks out of the way while you scroll down, and comes back when you scroll up.
-  let lastY = window.scrollY;
+  let lastY = window.scrollY, restTimer = 0;
   window.addEventListener('scroll', function () {
     const y = window.scrollY;
     if (fab && sheet && sheet.hidden) {
@@ -124,6 +125,9 @@ function startUi(SCOPE, PANEL_HTML, PANEL_CSS, UI_CSS, VERSION) {
       else if (y < lastY - 12 || y < 40) fab.classList.remove('tucked');
     }
     if (Math.abs(y - lastY) > 12) lastY = y;
+    // ...and always comes back once you stop, so it can never stay hidden.
+    clearTimeout(restTimer);
+    restTimer = setTimeout(function () { if (fab && sheet && sheet.hidden) fab.classList.remove('tucked'); }, 900);
   }, { passive: true });
 
   // Two fingers held still for 0.7 s.
@@ -187,4 +191,12 @@ function startUi(SCOPE, PANEL_HTML, PANEL_CSS, UI_CSS, VERSION) {
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);
   else start();
+
+  // Some sites rebuild the page after loading and throw our button away, and a
+  // few are not ready the first time. Check now and then, and put the fox back.
+  setInterval(function () {
+    if (document.hidden || !document.documentElement) return;
+    if (!host) { if (fails < 5) build(); }
+    else if (!host.isConnected) document.documentElement.appendChild(host);
+  }, 2000);
 }
