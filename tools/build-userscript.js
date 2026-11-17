@@ -125,6 +125,12 @@ const page = read(SRC, 'install.html')
   .replace(/<!--VERSION-->/g, VERSION);
 fs.writeFileSync(path.join(OUT, 'index.html'), page);
 fs.copyFileSync(path.join(EXT, 'images', 'icon-256.png'), path.join(OUT, 'icon.png'));
+
+// The step-by-step install guide and the privacy policy
+for (const name of ['guide', 'privacy']) {
+  fs.mkdirSync(path.join(OUT, name), { recursive: true });
+  fs.writeFileSync(path.join(OUT, name, 'index.html'), read(SRC, name + '.html').replace(/<!--FOX-->/g, S.foxSvg()));
+}
 fs.writeFileSync(path.join(OUT, '.nojekyll'), '');
 
 console.log('built docs/shuteye.user.js (' + Math.round(script.length / 1024) + ' KB), docs/index.html, docs/reader/');

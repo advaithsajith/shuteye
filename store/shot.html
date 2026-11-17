@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>Store screenshot</title>
+<!-- Composes a 1280x800 store screenshot: a darkened article with the ShutEye popup open over it.
+     Open as  store/shot.html?theme=dracula  through the local test server. -->
+<style>
+  html, body { margin: 0; width: 1280px; height: 800px; overflow: hidden; background: #202124; font: 13px system-ui, sans-serif; }
+  .bar { height: 44px; background: #2b2c30; display: flex; align-items: center; gap: 10px; padding: 0 14px; color: #bbb; }
+  .dot { width: 12px; height: 12px; border-radius: 50%; background: #555; }
+  .url { flex: 1; background: #1c1d20; border-radius: 16px; padding: 7px 14px; color: #ddd; }
+  .ico { width: 26px; height: 26px; border-radius: 6px; }
+  #page { position: absolute; left: 0; top: 44px; width: 1280px; height: 756px; border: 0; }
+  #pop { position: absolute; right: 18px; top: 50px; width: 384px; height: 700px; border: 0; border-radius: 12px; box-shadow: 0 12px 50px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.12); }
+</style></head>
+<body>
+<div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url">en.wikipedia.org/wiki/Solar_eclipse</span><img class="ico" src="../extension/images/icon-64.png" alt=""></div>
+<iframe id="page"></iframe><iframe id="pop"></iframe>
+<script>
+  var theme = new URLSearchParams(location.search).get('theme') || 'midnight';
+  localStorage.setItem('shuteye-test-store', JSON.stringify({ cfg: { theme: theme } }));
+  localStorage.setItem('shuteye-test-url', 'https://en.wikipedia.org/wiki/Solar_eclipse');
+  // The article sits in a frame here, so answer the popup's status question on its behalf.
+  var chan = new BroadcastChannel('shuteye-test');
+  chan.onmessage = function (e) { if (e.data.kind === 'ask') chan.postMessage({ kind: 'answer', id: e.data.id, res: { host: 'en.wikipedia.org', reason: 'on', active: true, pageDark: false, isPdf: false, url: 'https://en.wikipedia.org/wiki/Solar_eclipse' } }); };
+  document.getElementById('page').src = '../test/page.html';
+  setTimeout(function () { document.getElementById('pop').src = '../test/popup.html'; }, 600);
+</script>
+</body></html>

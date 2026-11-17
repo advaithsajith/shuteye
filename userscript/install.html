@@ -108,6 +108,8 @@
   header { display: flex; align-items: center; gap: 10px; margin-bottom: 40px; }
   header .mark { width: 50px; height: 43px; }
   header .name { font-size: 20px; flex: 1; }
+  a.pill { text-decoration: none; background: var(--cream); color: var(--ink); }
+  @media (max-width: 420px) { .pill.ver { display: none; } }
   .pill { border: 2px solid var(--cream); border-radius: 999px; padding: 5px 14px; font-size: 12px; font-weight: 500; white-space: nowrap; }
 
   h1 { font-size: clamp(44px, 12.5vw, 98px); text-shadow: 3px 3px 0 var(--ink); }
@@ -203,7 +205,8 @@
   <header>
     <span class="mark"><!--FOX--></span>
     <span class="name loud">ShutEye</span>
-    <span class="pill">v<!--VERSION--></span>
+    <a class="pill" href="guide/">How to install</a>
+    <span class="pill ver">v<!--VERSION--></span>
   </header>
 
   <h1 class="loud">Lights out for <em>every</em> website</h1>
@@ -215,6 +218,8 @@
 
   <h2 class="loud">On iPhone and iPad</h2>
   <div class="card state rise" id="state"><b></b><span id="stateText">Not installed on this browser yet.</span></div>
+
+  <p class="rise" style="margin:14px 2px 0">First time? The <a href="guide/">step-by-step guide</a> shows exactly where to tap.</p>
 
   <ol>
     <li class="card rise">
@@ -269,7 +274,7 @@
   </div>
 
   <p class="night-note loud rise">Goodnight.</p>
-  <footer>&copy; 2026 Advaith Sajith. All rights reserved. The PDF reader uses pdf.js by Mozilla (Apache 2.0).</footer>
+  <footer>&copy; 2026 Advaith Sajith. All rights reserved. The PDF reader uses pdf.js by Mozilla (Apache 2.0).<br><a href="guide/">How to install</a> · <a href="privacy/">Privacy</a></footer>
 </main>
 
 <div class="ground" aria-hidden="true">

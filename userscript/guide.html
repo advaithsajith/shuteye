@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en" data-shuteye-own>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#14142b">
+<meta name="shuteye-site" content="../">
+<title>How to install ShutEye</title>
+<meta name="description" content="Step-by-step guide to installing ShutEye on iPhone, iPad, Windows and Mac.">
+<link rel="icon" href="../icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Azeret+Mono:ital,wght@0,300;0,400;0,500;1,800;1,900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #f3ead9; --ink: #141a4a; --fox: #ff8a3d; --pink: #ff6b9d; --teal: #2fd3b8; --sun: #ffd76a; --lilac: #b9a4ff;
+    --bg: #14142b; --card: #1d1d3d; --line: #f3ead9; --sub: #a6a3c4;
+  }
+  * { box-sizing: border-box; }
+  html { background: var(--bg); scroll-behavior: smooth; }
+  body { margin: 0; color: var(--cream); font: 400 15px/1.65 "Azeret Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace; -webkit-font-smoothing: antialiased; -webkit-text-size-adjust: 100%; overflow-x: hidden; }
+  a { color: inherit; }
+  h1, h2, h3, p, ol, ul { margin: 0; padding: 0; }
+  .loud { font-weight: 900; font-style: italic; text-transform: uppercase; letter-spacing: -0.045em; line-height: 1; text-wrap: balance; }
+  .blob { position: fixed; z-index: 0; opacity: 0.2; pointer-events: none; border-radius: 58% 42% 55% 45% / 46% 60% 40% 54%; animation: morph 18s ease-in-out infinite alternate; }
+  .blob.a { width: 44vmax; height: 40vmax; left: -18vmax; top: 12%; background: var(--pink); }
+  .blob.b { width: 38vmax; height: 36vmax; right: -16vmax; top: 55%; background: var(--teal); animation-delay: -7s; }
+  @keyframes morph { to { border-radius: 40% 60% 38% 62% / 62% 38% 60% 40%; } }
+
+  main { position: relative; z-index: 1; max-width: 760px; margin: 0 auto; padding: 18px 16px 80px; }
+  header { display: flex; align-items: center; gap: 10px; margin-bottom: 34px; }
+  header .mark { width: 50px; height: 43px; }
+  header .name { font-size: 20px; flex: 1; text-decoration: none; }
+  .pill { border: 2px solid var(--cream); border-radius: 999px; padding: 6px 14px; font-size: 12px; font-weight: 500; white-space: nowrap; text-decoration: none; }
+  .pill:hover, .pill:focus-visible { background: var(--cream); color: var(--ink); outline: none; }
+
+  h1 { font-size: clamp(38px, 10.5vw, 76px); }
+  h1 em { color: var(--sun); font-style: inherit; }
+  .lede { margin-top: 16px; color: var(--sub); max-width: 56ch; }
+  nav.jump { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
+
+  h2 { font-size: clamp(26px, 7vw, 40px); margin: 64px 0 6px; scroll-margin-top: 18px; }
+  .time { color: var(--sub); font-size: 13px; margin-bottom: 18px; }
+
+  ol.steps { list-style: none; counter-reset: step; display: grid; gap: 18px; }
+  ol.steps > li {
+    counter-increment: step; position: relative; background: var(--card); border: 2.5px solid var(--line); border-radius: 26px;
+    padding: 34px 22px 22px; box-shadow: 6px 6px 0 #0a0a18; display: grid; gap: 16px;
+  }
+  @media (min-width: 640px) { ol.steps > li.pic { grid-template-columns: 1fr 210px; align-items: center; } }
+  ol.steps > li::before {
+    content: counter(step); position: absolute; top: -16px; left: 20px; width: 42px; height: 42px; border-radius: 50%;
+    display: grid; place-items: center; font-weight: 900; font-style: italic; font-size: 19px; color: var(--ink); background: var(--sun); border: 2.5px solid var(--ink);
+  }
+  ol.steps > li:nth-child(4n+2)::before { background: var(--pink); }
+  ol.steps > li:nth-child(4n+3)::before { background: var(--teal); }
+  ol.steps > li:nth-child(4n)::before { background: var(--fox); }
+  ol.steps h3 { font-size: 20px; margin-bottom: 6px; }
+  .path { color: var(--sub); font-size: 13px; margin-top: 8px; }
+  kbd { font: inherit; font-weight: 500; background: var(--bg); border: 1.5px solid var(--sub); border-radius: 7px; padding: 1px 7px; white-space: nowrap; }
+  .go { display: inline-flex; align-items: center; justify-content: center; margin-top: 12px; min-height: 50px; padding: 11px 24px; border-radius: 999px; background: var(--fox); color: var(--ink); border: 2.5px solid var(--ink); box-shadow: 4px 4px 0 #0a0a18; text-decoration: none; font-size: 14.5px; }
+  .go:active { transform: translate(3px, 3px); box-shadow: 1px 1px 0 #0a0a18; }
+  .go:focus-visible, a:focus-visible, summary:focus-visible { outline: 3px solid var(--sun); outline-offset: 3px; }
+
+  /* little drawings of where to tap */
+  .draw { width: 100%; max-width: 230px; height: auto; display: block; margin: 0 auto; }
+  .d-line { fill: none; stroke: var(--cream); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .d-fill { fill: var(--bg); stroke: var(--cream); stroke-width: 2; }
+  .d-dim { fill: #4a4870; }
+  .d-hot { fill: var(--sun); stroke: var(--ink); stroke-width: 2; }
+  .d-ring { fill: none; stroke: var(--sun); stroke-width: 2.5; stroke-dasharray: 5 5; animation: spin 9s linear infinite; transform-box: fill-box; transform-origin: center; }
+  .d-text { fill: var(--cream); font: 500 9px "Azeret Mono", ui-monospace, monospace; }
+  .d-text.ink { fill: var(--ink); }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  details { background: var(--card); border: 2.5px solid var(--line); border-radius: 20px; padding: 14px 18px; margin-top: 12px; }
+  summary { cursor: pointer; font-weight: 500; min-height: 30px; }
+  details p { color: var(--sub); margin-top: 8px; }
+  details p b { color: var(--cream); }
+
+  footer { margin-top: 64px; text-align: center; font-size: 12.5px; color: var(--sub); }
+
+  .fox { width: 100%; height: 100%; overflow: visible; display: block; }
+  .fox-fur { fill: var(--fox); } .fox-ear { fill: var(--ink); opacity: 0.4; } .fox-cheek { fill: var(--cream); } .fox-nose { fill: var(--ink); }
+  .fox-eye { display: none; } .fox-lid { fill: none; stroke: var(--ink); stroke-width: 1.9; stroke-linecap: round; }
+  .fox-z { fill: none; stroke: var(--cream); stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; opacity: 0.9; }
+
+  @view-transition { navigation: auto; }
+  ::view-transition-old(root) { animation: leave 0.35s ease both; }
+  ::view-transition-new(root) { animation: arrive 0.55s cubic-bezier(0.3, 0.7, 0.2, 1) both; }
+  @keyframes leave { to { opacity: 0; transform: scale(0.97); } }
+  @keyframes arrive { from { clip-path: circle(0 at 50% 100%); } to { clip-path: circle(150vmax at 50% 100%); } }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } html { scroll-behavior: auto; } }
+</style>
+</head>
+<body>
+<div class="blob a"></div><div class="blob b"></div>
+<main>
+  <header>
+    <span class="mark"><!--FOX--></span>
+    <a class="name loud" href="../">ShutEye</a>
+    <a class="pill" href="../">Home</a>
+  </header>
+
+  <h1 class="loud">How to <em>install</em></h1>
+  <p class="lede">Pick your device. Each guide takes a few minutes and you only do it once.</p>
+  <nav class="jump" aria-label="Guides">
+    <a class="pill" href="#iphone">iPhone and iPad</a>
+    <a class="pill" href="#desktop">Windows and Mac</a>
+    <a class="pill" href="#update">Updating</a>
+    <a class="pill" href="#help">Problems</a>
+  </nav>
+
+  <h2 class="loud" id="iphone">iPhone and iPad</h2>
+  <p class="time">About 3 minutes. Needs iOS or iPadOS 15.1 or later.</p>
+  <ol class="steps">
+    <li>
+      <div>
+        <h3 class="loud">Get the Userscripts app</h3>
+        <p>ShutEye runs inside Userscripts, an app from the App Store that lets Safari run add-ons like this one. Install it, then open it once so it can set itself up.</p>
+        <a class="go loud" href="https://apps.apple.com/app/userscripts/id1463298887">Open the App Store</a>
+      </div>
+    </li>
+    <li>
+      <div>
+        <h3 class="loud">Switch it on in Safari</h3>
+        <p>Open the <kbd>Settings</kbd> app and go to <kbd>Apps</kbd> &gt; <kbd>Safari</kbd> &gt; <kbd>Extensions</kbd> &gt; <kbd>Userscripts</kbd>. Turn on <kbd>Allow Extension</kbd>, then set <kbd>All Websites</kbd> to <kbd>Allow</kbd>.</p>
+        <p class="path">On iOS 17 or earlier the path is Settings &gt; Safari &gt; Extensions.</p>
+      </div>
+    </li>
+    <li class="pic">
+      <div>
+        <h3 class="loud">Open the ShutEye script</h3>
+        <p>In Safari, tap the button below. A page full of code opens. That is the script, and it is meant to look like that.</p>
+        <a class="go loud" href="../shuteye.user.js">Open the script</a>
+      </div>
+      <svg class="draw" viewBox="0 0 200 120" role="img" aria-label="Safari showing a page of code">
+        <rect class="d-fill" x="6" y="6" width="188" height="108" rx="14"/>
+        <rect class="d-dim" x="20" y="22" width="120" height="6" rx="3"/><rect class="d-dim" x="20" y="34" width="150" height="6" rx="3"/>
+        <rect class="d-dim" x="20" y="46" width="96" height="6" rx="3"/><rect class="d-dim" x="20" y="58" width="136" height="6" rx="3"/>
+        <rect class="d-dim" x="20" y="70" width="110" height="6" rx="3"/>
+        <rect class="d-fill" x="20" y="88" width="160" height="18" rx="9"/>
+        <text class="d-text" x="46" y="100">shuteye.user.js</text>
+      </svg>
+    </li>
+    <li class="pic">
+      <div>
+        <h3 class="loud">Tap the page menu</h3>
+        <p>With the code page still open, tap the button at the left end of Safari's address bar. Depending on your iOS version it looks like <kbd>aA</kbd> or a small page icon.</p>
+      </div>
+      <svg class="draw" viewBox="0 0 200 120" role="img" aria-label="The page menu button at the left of the address bar">
+        <rect class="d-fill" x="6" y="6" width="188" height="108" rx="14"/>
+        <rect class="d-fill" x="20" y="80" width="160" height="24" rx="12"/>
+        <circle class="d-hot" cx="36" cy="92" r="9"/>
+        <text class="d-text ink" x="29.5" y="95">aA</text>
+        <circle class="d-ring" cx="36" cy="92" r="17"/>
+        <text class="d-text" x="58" y="95">shuteye.user.js</text>
+        <path class="d-line" d="M36 66 v-26 m-7 8 l7 -8 l7 8"/>
+        <text class="d-text" x="50" y="46">tap here</text>
+      </svg>
+    </li>
+    <li class="pic">
+      <div>
+        <h3 class="loud">Choose Userscripts, then install</h3>
+        <p>In the menu, tap <kbd>Userscripts</kbd>. If it asks for permission, choose <kbd>Always Allow</kbd> and then <kbd>Always Allow on Every Website</kbd>. A line appears saying a userscript was detected. Tap it, then tap <kbd>Install</kbd>.</p>
+      </div>
+      <svg class="draw" viewBox="0 0 200 120" role="img" aria-label="The menu with Userscripts highlighted and an install prompt">
+        <rect class="d-fill" x="6" y="6" width="188" height="108" rx="14"/>
+        <rect class="d-dim" x="20" y="18" width="160" height="16" rx="6"/>
+        <rect class="d-hot" x="20" y="40" width="160" height="20" rx="6"/>
+        <text class="d-text ink" x="30" y="53">Userscripts</text>
+        <rect class="d-dim" x="20" y="66" width="160" height="16" rx="6"/>
+        <rect class="d-fill" x="20" y="88" width="160" height="18" rx="6"/>
+        <text class="d-text" x="30" y="100">Tap to install ShutEye</text>
+      </svg>
+    </li>
+    <li class="pic">
+      <div>
+        <h3 class="loud">Reload a website</h3>
+        <p>Open any website and reload it. It goes dark, and a small fox sits in the bottom corner. Tap the fox to change the theme or switch a site off.</p>
+        <p class="path">The fox ducks away while you scroll and returns when you stop. Holding two fingers still on the page for a second also opens the panel.</p>
+      </div>
+      <svg class="draw" viewBox="0 0 200 120" role="img" aria-label="A dark page with the fox button in the corner">
+        <rect x="6" y="6" width="188" height="108" rx="14" fill="#000" stroke="#f3ead9" stroke-width="2"/>
+        <rect x="20" y="22" width="110" height="7" rx="3.5" fill="#f3ead9"/><rect class="d-dim" x="20" y="38" width="150" height="5" rx="2.5"/>
+        <rect class="d-dim" x="20" y="50" width="132" height="5" rx="2.5"/><rect class="d-dim" x="20" y="62" width="144" height="5" rx="2.5"/>
+        <circle cx="168" cy="92" r="13" fill="#000" stroke="#f3ead9" stroke-width="2"/>
+        <polygon points="160,84 164.5,88 171.5,88 176,84 177,92 172.5,98 168,101.5 163.5,98 159,92" fill="#ff8a3d"/>
+        <circle class="d-ring" cx="168" cy="92" r="20"/>
+      </svg>
+    </li>
+  </ol>
+
+  <h2 class="loud" id="desktop">Windows and Mac</h2>
+  <p class="time">About 2 minutes. Works in Chrome, Edge and Brave, on Windows, Mac and Linux.</p>
+  <ol class="steps">
+    <li>
+      <div>
+        <h3 class="loud">Download and unzip</h3>
+        <p>Download the zip, then unzip it. On Windows, right-click the file and choose <kbd>Extract All</kbd>. You get a folder called <kbd>shuteye</kbd>. Keep it somewhere it can stay, such as Documents.</p>
+        <a class="go loud" href="https://github.com/advaithsajith/shuteye/releases/latest/download/shuteye-desktop.zip">Download for desktop</a>
+      </div>
+    </li>
+    <li>
+      <div>
+        <h3 class="loud">Open the extensions page</h3>
+        <p>In Chrome or Brave, type <kbd>chrome://extensions</kbd> into the address bar and press Enter. In Edge, use <kbd>edge://extensions</kbd>.</p>
+      </div>
+    </li>
+    <li class="pic">
+      <div>
+        <h3 class="loud">Turn on Developer mode</h3>
+        <p>Flip the <kbd>Developer mode</kbd> switch. In Chrome it is at the top right of the page. In Edge it is in the left sidebar.</p>
+      </div>
+      <svg class="draw" viewBox="0 0 200 120" role="img" aria-label="The Developer mode switch turned on">
+        <rect class="d-fill" x="6" y="6" width="188" height="108" rx="10"/>
+        <text class="d-text" x="20" y="30">Extensions</text>
+        <text class="d-text" x="92" y="30">Developer mode</text>
+        <rect class="d-hot" x="164" y="20" width="24" height="14" rx="7"/>
+        <circle cx="181" cy="27" r="5" fill="#141a4a"/>
+        <rect class="d-dim" x="20" y="50" width="76" height="46" rx="6"/><rect class="d-dim" x="104" y="50" width="76" height="46" rx="6"/>
+      </svg>
+    </li>
+    <li>
+      <div>
+        <h3 class="loud">Load the folder</h3>
+        <p>Click <kbd>Load unpacked</kbd>, pick the unzipped <kbd>shuteye</kbd> folder (the one that contains <kbd>manifest.json</kbd>), and confirm. ShutEye appears in the list.</p>
+      </div>
+    </li>
+    <li>
+      <div>
+        <h3 class="loud">Pin the fox</h3>
+        <p>Click the puzzle-piece button in the toolbar and pin ShutEye. Click the fox any time to change the theme, tune it, or open the dark PDF reader.</p>
+        <p class="path">Do not delete or move the folder afterwards. The browser runs ShutEye from it.</p>
+      </div>
+    </li>
+  </ol>
+
+  <h2 class="loud" id="update">Updating</h2>
+  <details open>
+    <summary>iPhone and iPad</summary>
+    <p>In Safari, open the page menu and tap <b>Userscripts</b>, then use its update check. If that does not find the new version, open the <a href="../shuteye.user.js">script page</a> again and install it over the old one. Reload any tabs that were already open.</p>
+  </details>
+  <details>
+    <summary>Windows and Mac</summary>
+    <p>Download the new zip, unzip it over the old <b>shuteye</b> folder, then press the reload arrow on ShutEye's card on the extensions page.</p>
+  </details>
+
+  <h2 class="loud" id="help">Problems</h2>
+  <details>
+    <summary>No install prompt on iPhone</summary>
+    <p><b>1.</b> Make sure Userscripts is allowed on the page: open the page menu, tap Userscripts, and choose Always Allow on Every Website. Reload the script page and open Userscripts again.</p>
+    <p><b>2.</b> Or skip the prompt: on the script page tap Share, then Save to Files, and save it into your Userscripts folder, keeping the name ending in .user.js. Open the Userscripts menu in Safari once so it notices the file, and check ShutEye is switched on.</p>
+    <p><b>3.</b> There is no prompt for a copy you already have. See Updating above.</p>
+  </details>
+  <details>
+    <summary>Installed, but pages are not dark</summary>
+    <p>Reload the page: tabs that were open before installing need one reload. Then check Userscripts is allowed on <b>All Websites</b> in Safari's extension settings, and that ShutEye is switched on in the Userscripts menu.</p>
+  </details>
+  <details>
+    <summary>The fox is missing</summary>
+    <p>It hides while you scroll down and returns about a second after you stop. You can also hold two fingers still on the page for a second. If you turned the fox off, that gesture opens the panel so you can turn it back on.</p>
+  </details>
+  <details>
+    <summary>A site looks wrong</summary>
+    <p>Open the panel and set <b>This site</b> to <b>Never</b>, or try <b>Images here</b> on <b>Natural</b> or <b>Darken</b>. If a page is covered in one flat colour, open <b>Fine-tune</b> and turn off <b>Colour tint</b>.</p>
+  </details>
+  <details>
+    <summary>PDFs stay white</summary>
+    <p>Safari's built-in PDF viewer cannot be restyled by any add-on. Use the <a href="../reader/">ShutEye PDF reader</a> and open the PDF from Files.</p>
+  </details>
+
+  <footer>&copy; 2026 Advaith Sajith. All rights reserved. <a href="../privacy/">Privacy</a></footer>
+</main>
+</body>
+</html>
