@@ -14,6 +14,13 @@
   const $ = function (id) { return document.getElementById(id); };
   const pdfjs = globalThis.pdfjsLib;
 
+  // Other reader modules (the annotation tools) listen in on what the reader does.
+  const bus = globalThis.ShutEyeReader = {
+    handlers: {},
+    on: function (name, fn) { (this.handlers[name] = this.handlers[name] || []).push(fn); },
+    emit: function (name, a, b) { (this.handlers[name] || []).forEach(function (fn) { try { fn(a, b); } catch (e) { console.warn("ShutEye Reader:", e); } }); }
+  };
+
   pdfjs.GlobalWorkerOptions.workerSrc = 'vendor/pdf.worker.min.js';
 
   const SMALL_SCREEN = Math.min(screen.width, screen.height) < 820;
@@ -219,6 +226,8 @@
       p.el.appendChild(canvas);
       p.label.hidden = true;
       p.drawn = gen;
+      p.scale = viewport.scale;
+      bus.emit("page", p);
       return page.getTextContent();
     }).then(function (content) {
       if (!content || gen !== generation || doc !== pdf || p.canvas !== canvas) return;
@@ -227,7 +236,8 @@
       layer.style.setProperty('--scale-factor', viewport.scale);
       p.el.appendChild(layer);
       p.text = layer;
-      pdfjs.renderTextLayer({ textContentSource: content, container: layer, viewport: viewport });
+      const task = pdfjs.renderTextLayer({ textContentSource: content, container: layer, viewport: viewport });
+      if (task && task.promise) task.promise.then(function () { bus.emit("text", p); }, function () { /* cancelled */ });
     });
   }
 
@@ -311,6 +321,7 @@
   }
 
   function close() {
+    bus.emit("close");
     generation++;
     queue = [];
     pages.forEach(release);
@@ -349,6 +360,7 @@
       setProgress(null);
       $('tools').hidden = false;
       $('pageBtn').textContent = '1 / ' + pdf.numPages;
+      bus.emit('open', { pdf: pdf, key: docKey, name: name || 'document' });
       const last = positions[docKey];
       if (last && last.page > 1) { goTo(last.page); updateNear(); }
     }).catch(function (err) {
@@ -450,6 +462,14 @@
     paint();
     if (before !== JSON.stringify([cfg.theme, cfg.custom, cfg.brightness, cfg.contrast, cfg.sepia, cfg.tint, cfg.reader])) redrawSoon();
   });
+
+  // What the annotation tools may use.
+  bus.U = U;
+  bus.api = api;
+  bus.pages = function () { return pages; };
+  bus.goTo = function (n, f) { goTo(n, f); updateNear(); };
+  bus.currentPage = currentPage;
+  bus.cfg = function () { return cfg; };
 
   /* ---------- Start ---------- */
 

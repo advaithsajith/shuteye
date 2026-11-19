@@ -880,6 +880,19 @@
   win.addEventListener('pageshow', function (e) { if (e.persisted) load(); });
   win.addEventListener('popstate', function () { if (lastPath !== sitePath()) { lastPath = sitePath(); apply(); } });
 
+  // Alt+Shift+D switches ShutEye on and off from the keyboard.
+  if (isTop) {
+    doc.addEventListener('keydown', function (e) {
+      if (!e.altKey || !e.shiftKey || e.code !== 'KeyD' || e.repeat) return;
+      e.preventDefault();
+      api.storage.local.get('cfg').then(function (d) {
+        const next = NR.normalize(d && d.cfg);
+        next.enabled = !next.enabled;
+        return api.storage.local.set({ cfg: next });
+      }).catch(function () { /* storage unavailable */ });
+    }, true);
+  }
+
   hello();
   load();
 })();

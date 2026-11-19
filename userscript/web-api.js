@@ -31,7 +31,7 @@
   }
 
   // Only look-and-feel settings are accepted from outside.
-  var THEME_KEYS = ['theme', 'custom', 'brightness', 'contrast', 'sepia', 'tint'];
+  var THEME_KEYS = ['theme', 'custom', 'brightness', 'contrast', 'sepia', 'gray', 'tint'];
   function adopt(theme) {
     if (!theme || typeof theme !== 'object') return;
     var cfg = Object.assign({}, read('cfg'));

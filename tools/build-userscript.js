@@ -109,7 +109,7 @@ reader = reader
   .replace('<meta name="color-scheme" content="dark">', '<meta name="color-scheme" content="dark">\n  <meta name="shuteye-site" content="../">')
   .replace('<script src="shared.js"></script>', '<script src="web-api.js"></script>\n  <script src="shared.js"></script>');
 fs.writeFileSync(path.join(OUT, 'reader', 'index.html'), reader);
-for (const f of ['reader.css', 'reader.js', 'shared.js']) fs.copyFileSync(path.join(EXT, f), path.join(OUT, 'reader', f));
+for (const f of ['reader.css', 'reader.js', 'reader-notes.js', 'shared.js']) fs.copyFileSync(path.join(EXT, f), path.join(OUT, 'reader', f));
 fs.copyFileSync(path.join(SRC, 'web-api.js'), path.join(OUT, 'reader', 'web-api.js'));
 for (const f of fs.readdirSync(path.join(EXT, 'vendor'))) fs.copyFileSync(path.join(EXT, 'vendor', f), path.join(OUT, 'reader', 'vendor', f));
 

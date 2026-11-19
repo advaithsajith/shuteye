@@ -85,6 +85,10 @@
       <input type="range" id="sepia" min="0" max="80" step="1">
     </div>
     <div class="slider">
+      <div class="slider-top"><label for="gray">Black and white</label><output id="grayOut"></output></div>
+      <input type="range" id="gray" min="0" max="100" step="5">
+    </div>
+    <div class="slider">
       <div class="slider-top"><label for="imageDim">Photo brightness</label><output id="imageDimOut"></output></div>
       <input type="range" id="imageDim" min="30" max="100" step="1">
     </div>
@@ -143,6 +147,7 @@
 
   <button type="button" class="ghost" id="readerBtn">Open the dark PDF reader</button>
 
+  <p class="hint" style="text-align:center;margin:0 0 8px">Keyboard: Alt+Shift+D switches ShutEye on and off.</p>
   <footer>ShutEye is free. Nothing leaves your device. &copy; 2026 Advaith Sajith. All rights reserved.</footer>
 
   <script src="shared.js"></script>

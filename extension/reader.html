@@ -21,6 +21,27 @@
     <button type="button" id="openBtn">Open</button>
   </header>
 
+  <!-- Annotation tools. Shown once a PDF is open. -->
+  <div id="toolbar" hidden>
+    <div class="strip" role="toolbar" aria-label="Annotation tools">
+      <button type="button" data-tool="select">Read</button>
+      <button type="button" data-tool="highlight">Highlight</button>
+      <button type="button" data-tool="underline">Underline</button>
+      <button type="button" data-tool="strike">Strike</button>
+      <button type="button" data-tool="pen">Pen</button>
+      <button type="button" data-tool="note">Note</button>
+      <button type="button" data-tool="text">Text</button>
+      <button type="button" data-tool="eraser">Eraser</button>
+      <span class="sep"></span>
+      <span id="swatches" class="swatches"></span>
+      <span class="sep"></span>
+      <button type="button" id="undoBtn">Undo</button>
+      <button type="button" id="findBtn">Search</button>
+      <button type="button" id="panelBtn">Notes <b id="notesCount"></b></button>
+    </div>
+    <p id="toolHint"></p>
+  </div>
+
   <div id="progress" hidden><span></span></div>
 
   <main id="pages"></main>
@@ -37,10 +58,53 @@
     <p class="hint">Files are opened on this device only. Nothing is uploaded.</p>
   </section>
 
+  <!-- Side panel: the list of annotations, the PDF's outline, and search. -->
+  <aside id="panel" hidden aria-label="Notes, outline and search">
+    <div class="panel-top">
+      <div id="panelTabs" class="tabs">
+        <button type="button" data-tab="notes">Notes</button>
+        <button type="button" data-tab="outline">Outline</button>
+        <button type="button" data-tab="find">Search</button>
+      </div>
+      <button type="button" id="panelClose" aria-label="Close panel">Done</button>
+    </div>
+    <div id="tab-notes">
+      <ul id="notesList" class="rows"></ul>
+      <p id="notesEmpty" class="empty">Nothing yet. Pick Highlight, Pen or Note above and mark up the page.</p>
+      <button type="button" class="cta" id="saveCopy">Save a copy with annotations</button>
+      <p id="saveStatus" class="empty"></p>
+      <button type="button" class="plain" id="clearAll" hidden>Remove all annotations</button>
+    </div>
+    <div id="tab-outline" hidden>
+      <ul id="outlineList" class="rows"></ul>
+      <p id="outlineEmpty" class="empty" hidden>This PDF has no outline.</p>
+    </div>
+    <div id="tab-find" hidden>
+      <form id="findForm"><input type="search" id="findInput" placeholder="Search this PDF" aria-label="Search this PDF" autocapitalize="off"><button type="submit">Go</button></form>
+      <p id="findStatus" class="empty"></p>
+      <ul id="findList" class="rows"></ul>
+    </div>
+  </aside>
+
+  <!-- Typing a note or text -->
+  <div id="noteBox" hidden role="dialog" aria-labelledby="noteTitle">
+    <div class="note-card">
+      <h2 id="noteTitle">Note</h2>
+      <textarea id="noteText" rows="4" placeholder="Type here"></textarea>
+      <div class="note-actions">
+        <button type="button" class="plain" id="noteDelete">Delete</button>
+        <span></span>
+        <button type="button" class="plain" id="noteCancel">Cancel</button>
+        <button type="button" class="cta small" id="noteSave">Save</button>
+      </div>
+    </div>
+  </div>
+
   <input type="file" id="file" accept="application/pdf,.pdf" hidden>
 
   <script src="shared.js"></script>
   <script src="vendor/pdf.min.js"></script>
   <script src="reader.js"></script>
+  <script src="reader-notes.js"></script>
 </body>
 </html>

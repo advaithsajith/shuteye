@@ -43,7 +43,9 @@ switch it off.
 - **Per-site rules**: Auto, Always or Never for each site, or for one section of a site (Google Docs but not Sheets), plus a mode that only darkens sites you pick.
 - **Leaves dark sites alone.** It checks each page's own colours first.
 - **Schedule**: always on, follow the device's Light/Dark appearance, or set hours.
-- **Dark PDF reader** with your theme, text selection, Find on Page, and it remembers your page in each book.
+- **Dark PDF reader** with your theme, text selection and search. It remembers your page in each book.
+- **PDF annotation**: highlight, underline and strike through text, draw with a pen, pin notes and type on the page. A side panel lists every annotation and the PDF's outline, and you can save a copy of the PDF with the annotations drawn in.
+- **Black and white mode** and a keyboard switch (Alt+Shift+D on a computer).
 
 ## Two ways to install
 

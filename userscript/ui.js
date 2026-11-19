@@ -27,7 +27,7 @@ function startUi(SCOPE, PANEL_HTML, PANEL_CSS, UI_CSS, VERSION) {
   }
 
   function themeOnly(cfg) {
-    return { theme: cfg.theme, custom: cfg.custom, brightness: cfg.brightness, contrast: cfg.contrast, sepia: cfg.sepia, tint: cfg.tint, reader: cfg.reader };
+    return { theme: cfg.theme, custom: cfg.custom, brightness: cfg.brightness, contrast: cfg.contrast, sepia: cfg.sepia, gray: cfg.gray, tint: cfg.tint, reader: cfg.reader };
   }
 
   function build() {

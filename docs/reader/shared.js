@@ -49,6 +49,7 @@
     contrast:   [60, 130],
     sepia:      [0, 80],
     imageDim:   [30, 100],
+    gray:       [0, 100],
     animMs:     [150, 1500]
   };
 
@@ -64,6 +65,7 @@
     brightness: 100,           // fine-tuning on top of the theme
     contrast: 100,
     sepia: 0,                  // warmth
+    gray: 0,                   // 100 = fully black and white, for fewer distractions
     imageDim: 100,             // brightness of photos and video, for bright pictures at night
     tint: true,                // colour themes; off = neutral gray version (compatibility)
     accentLinks: false,        // recolour links with the theme accent
@@ -113,6 +115,7 @@
       contrast: num(c.contrast, 'contrast'),
       sepia: num(c.sepia, 'sepia'),
       imageDim: num(c.imageDim, 'imageDim'),
+      gray: num(c.gray, 'gray'),
       tint: c.tint !== false,
       accentLinks: c.accentLinks === true,
       anim: oneOf(c.anim, ANIMATIONS.map(function (a) { return a.id; }), DEFAULTS.anim),
@@ -266,6 +269,14 @@
 
   function contrastAff(c) { return scaleAff([c, c, c], [0.5 - 0.5 * c, 0.5 - 0.5 * c, 0.5 - 0.5 * c]); }
   function brightAff(b) { return scaleAff([b, b, b]); }
+  function grayAff(s) {
+    const k = 1 - s;
+    return aff([
+      0.2126 + 0.7874 * k, 0.7152 - 0.7152 * k, 0.0722 - 0.0722 * k,
+      0.2126 - 0.2126 * k, 0.7152 + 0.2848 * k, 0.0722 - 0.0722 * k,
+      0.2126 - 0.2126 * k, 0.7152 - 0.7152 * k, 0.0722 + 0.9278 * k
+    ]);
+  }
   function sepiaAff(s) {
     const k = 1 - s;
     return aff([
@@ -356,6 +367,7 @@
     }
     if (cfg.contrast !== 100) { out.post.push(contrastAff(cfg.contrast / 100)); filter += ' contrast(' + cfg.contrast + '%)'; }
     if (cfg.brightness !== 100) { out.post.push(brightAff(cfg.brightness / 100)); filter += ' brightness(' + cfg.brightness + '%)'; }
+    if (cfg.gray > 0) { out.post.push(grayAff(cfg.gray / 100)); filter += ' grayscale(' + cfg.gray + '%)'; }
     if (cfg.sepia > 0) { out.post.push(sepiaAff(cfg.sepia / 100)); filter += ' sepia(' + cfg.sepia + '%)'; }
     out.filter = filter;
     return out;

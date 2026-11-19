@@ -51,7 +51,10 @@ STAY IN CONTROL
 • "Only darken sites I pick" mode for people who want it on just a few sites.
 
 DARK PDF READER
-Open any PDF in ShutEye's own reader and it is drawn in your theme, with selectable text, find-on-page and your place remembered in each document. Photos inside the PDF keep their real colours.
+Open any PDF in ShutEye's own reader and it is drawn in your theme, with selectable text, search and your place remembered in each document. Photos inside the PDF keep their real colours.
+
+ANNOTATE PDFS
+Highlight, underline and strike through text, draw with a pen, pin notes and type on the page, in five colours. A side panel lists every annotation and the document outline. Save a copy of the PDF with your annotations drawn in, ready to share. Annotations are kept on your device.
 
 PRIVATE BY DESIGN
 ShutEye has no accounts, no analytics and no ads. Your settings stay on your device and nothing about your browsing is collected or sent anywhere.
@@ -172,7 +175,7 @@ https://advaithsajith.github.io/shuteye/privacy/
   Expect it to take from a few days up to a few weeks.
 - The most common reason for rejection is a description that does not match
   what the extension does, or a permission without a clear reason. The text
-  above was written to match the code as it stands at version 1.0.3.
+  above was written to match the code as it stands at version 1.1.0.
 - If Google asks why ShutEye needs every site, the host permission
   justification above is the answer to send.
 

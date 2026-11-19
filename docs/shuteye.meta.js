@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ShutEye
 // @description  Dark mode for every website, in your own theme. Tap the fox to change it.
-// @version      1.0.3
+// @version      1.1.0
 // @match        *://*/*
 // @updateURL    https://advaithsajith.github.io/shuteye/shuteye.meta.js
 // @downloadURL  https://advaithsajith.github.io/shuteye/shuteye.user.js

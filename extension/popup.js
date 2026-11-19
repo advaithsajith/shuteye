@@ -211,13 +211,14 @@
     const setContrast = slider('contrast', pctLabel);
     const setSepia = slider('sepia', function (v) { return v === 0 ? 'Off' : v + '%'; });
       const setImageDim = slider('imageDim', pctLabel);
+    const setGray = slider('gray', function (v) { return v === 0 ? 'Off' : v + '%'; });
     const setTint = toggle('tint', function () { return cfg.tint; }, function (v) { cfg.tint = v; });
     const setAccentLinks = toggle('accentLinks', function () { return cfg.accentLinks; }, function (v) { cfg.accentLinks = v; });
     const setImages = seg($('images'), function (v) { cfg.images = v; renderAll(); save(); });
 
     $('resetTune').addEventListener('click', function () {
       const t = U.themeById(cfg.theme);
-      cfg.brightness = 100; cfg.contrast = 100; cfg.sepia = t && t.warm ? t.warm : 0; cfg.imageDim = 100;
+      cfg.brightness = 100; cfg.contrast = 100; cfg.sepia = t && t.warm ? t.warm : 0; cfg.imageDim = 100; cfg.gray = 0;
       cfg.tint = true; cfg.accentLinks = false; cfg.images = 'smart';
       renderAll(); save();
     });
@@ -308,6 +309,7 @@
       if (cfg.brightness !== 100) tuned.push('Brightness ' + cfg.brightness + '%');
       if (cfg.contrast !== 100) tuned.push('Contrast ' + cfg.contrast + '%');
       if (cfg.sepia > 0) tuned.push('Warmth ' + cfg.sepia + '%');
+      if (cfg.gray > 0) tuned.push('Black and white ' + cfg.gray + '%');
       $('tuneSummary').textContent = tuned.length ? tuned[0] + (tuned.length > 1 ? ' +' + (tuned.length - 1) : '') : 'Theme defaults';
 
       const a = U.ANIMATIONS.filter(function (x) { return x.id === cfg.anim; })[0];
@@ -331,7 +333,7 @@
       setEnabled();
       renderSite();
       renderThemes();
-      setBrightness(); setContrast(); setSepia(); setImageDim(); setTint(); setAccentLinks(); setImages(cfg.images);
+      setBrightness(); setContrast(); setSepia(); setImageDim(); setGray(); setTint(); setAccentLinks(); setImages(cfg.images);
       setAnim(cfg.anim); setAnimMs();
       setSchedule(cfg.schedule);
       $('timeFrom').value = cfg.timeFrom;
