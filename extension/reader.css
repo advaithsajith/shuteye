@@ -148,7 +148,9 @@ svg.notes .tappable { pointer-events: all; cursor: pointer; }
 body[data-tool="pen"] svg.notes, body[data-tool="note"] svg.notes, body[data-tool="text"] svg.notes { pointer-events: all; touch-action: none; cursor: crosshair; }
 body[data-tool="eraser"] svg.notes .ann { pointer-events: all; cursor: pointer; }
 body[data-tool="pen"] .textLayer, body[data-tool="note"] .textLayer, body[data-tool="text"] .textLayer, body[data-tool="eraser"] .textLayer { pointer-events: none; }
-.textLayer span.hit { background: rgba(255, 216, 77, 0.45); border-radius: 2px; }
+svg.notes .hits rect { fill: #ffd84d; fill-opacity: 0.5; }
+/* the hint only appears while a tool is in use, to leave more room for the page */
+body[data-tool="select"] #toolHint { display: none; }
 
 /* ---------- Side panel ---------- */
 

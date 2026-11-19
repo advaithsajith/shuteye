@@ -128,6 +128,7 @@
       }
       svg.appendChild(g);
     });
+    if (query) drawHits(p);
   }
 
   function drawAll() { R.pages().forEach(function (p) { if (p.drawn >= 0) drawPage(p.num); }); }
@@ -422,11 +423,44 @@
     step();
   }
 
-  // Lights up matching words on the pages that are drawn.
-  function markHits() {
-    document.querySelectorAll('.textLayer span').forEach(function (s) {
-      s.classList.toggle('hit', !!query && query.length > 1 && s.textContent.toLowerCase().indexOf(query) >= 0);
-    });
+  // Lights up the matching words on the pages that are drawn. Each match is
+  // measured in the page's hidden text and drawn as a box over the page.
+  function markHits() { R.pages().forEach(function (p) { if (p.drawn >= 0) drawHits(p); }); }
+
+  function drawHits(p) {
+    const svg = p.el.querySelector('svg.notes');
+    if (!svg) return;
+    const old = svg.querySelector('g.hits');
+    if (old) old.remove();
+    if (!query || query.length < 2 || !p.text) return;
+    const box = p.el.getBoundingClientRect();
+    if (!box.width) return;
+    const g = el('g', { 'class': 'hits' });
+    let count = 0;
+    const spans = p.text.querySelectorAll('span');
+    for (let i = 0; i < spans.length && count < 400; i++) {
+      const node = spans[i].firstChild;
+      if (!node || node.nodeType !== 3) continue;
+      const text = node.nodeValue.toLowerCase();
+      let at = text.indexOf(query);
+      while (at >= 0 && count < 400) {
+        const range = document.createRange();
+        range.setStart(node, at);
+        range.setEnd(node, at + query.length);
+        const rects = range.getClientRects();
+        for (let k = 0; k < rects.length; k++) {
+          const rc = rects[k];
+          if (rc.width < 1) continue;
+          g.appendChild(el('rect', {
+            x: (rc.left - box.left) / box.width * p.w, y: (rc.top - box.top) / box.height * p.h,
+            width: rc.width / box.width * p.w, height: rc.height / box.height * p.h, rx: 1.5
+          }));
+          count++;
+        }
+        at = text.indexOf(query, at + query.length);
+      }
+    }
+    if (count) svg.insertBefore(g, svg.firstChild);
   }
 
   $('findForm').addEventListener('submit', function (e) { e.preventDefault(); search($('findInput').value); });
@@ -434,7 +468,8 @@
 
   /* ---------- Read aloud ---------- */
 
-  const voice = U.speaker();
+  // (An out-of-date cached copy of shared.js may not have the speaker yet.)
+  const voice = U.speaker ? U.speaker() : { supported: false, stop: function () {}, say: function () {}, setRate: function () {}, isPlaying: function () { return false; } };
   const RATES = [1, 1.25, 1.5, 0.85];
   let rateAt = 0;
 
@@ -559,7 +594,7 @@
     undoStack = []; query = '';
     Object.keys(pageText).forEach(function (k) { delete pageText[k]; delete rawText[k]; });
     $('toolbar').hidden = false;
-    $('findList').textContent = ''; $('findStatus').textContent = ''; $('saveStatus').textContent = '';
+    $('findList').textContent = ''; $('findStatus').textContent = ''; $('saveStatus').textContent = ''; $('findInput').value = '';
     api.storage.local.get('annotations').catch(function () { return {}; }).then(function (d) {
       store = (d && d.annotations) || {};
       anns = (store[key] && store[key].list) || [];
@@ -573,7 +608,7 @@
     closeEdit(); list();
   });
   R.on('page', function (p) { drawPage(p.num); });
-  R.on('text', function () { if (query) markHits(); });
+  R.on('text', function (p) { if (query) drawHits(p); });
 
   setTool('select');
   list();

@@ -56,6 +56,22 @@ body.off .fox-lid { opacity: 0; }
 body.off .fox-eye { transform: scale(1); }
 body.off .fox-zz { display: none; }
 body.off .fox-head { animation: none; }
+/* Wind-down: every few seconds the fox tips its head back and yawns. */
+.winding .fox-head { animation: yawn-head 7s ease-in-out infinite; }
+.winding .fox-nose { transform-box: fill-box; transform-origin: 50% 20%; animation: yawn-mouth 7s ease-in-out infinite; }
+.winding .fox-lid { animation: yawn-lids 7s ease-in-out infinite; }
+@keyframes yawn-head {
+  0%, 52%, 100% { transform: translateY(0) rotate(0); }
+  64%, 80% { transform: translateY(-1.6px) rotate(-7deg) scale(1.03); }
+}
+@keyframes yawn-mouth {
+  0%, 54%, 96%, 100% { transform: scale(1); }
+  66%, 80% { transform: scale(1.9, 2.5); }
+}
+@keyframes yawn-lids {
+  0%, 54%, 96%, 100% { stroke-width: 1.9; }
+  66%, 80% { stroke-width: 2.6; }
+}
 @keyframes breathe { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(0.7px) scale(1.018); } }
 @keyframes snooze {
   0% { opacity: 0; transform: translate(-2px, 3px); }

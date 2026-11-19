@@ -24,6 +24,9 @@
 .se-fab.tucked { transform: translateY(96px); opacity: 0; pointer-events: none; }
 .se-fab .fox { width: 100%; height: 100%; }
 .se-fab .fox-head, .se-fab .fox-z { animation: none; }
+.se-fab.winding .fox-head { animation: yawn-head 7s ease-in-out infinite; }
+.se-fab.winding .fox-nose { animation: yawn-mouth 7s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { .se-fab.winding .fox-head, .se-fab.winding .fox-nose { animation: none; } }
 .se-fab .fox-zz { display: none; }
 
 .se-shade { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.45); }

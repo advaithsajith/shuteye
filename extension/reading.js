@@ -213,7 +213,7 @@
     }));
     const article = document.createElement('div');
     article.className = 'doc';
-    const voice = NR.speaker();
+    const voice = NR.speaker ? NR.speaker() : { supported: false };
     if (voice.supported) {
       const listen = button('Listen', 'Read the article aloud', function () {
         if (voice.isPlaying()) { voice.stop(); listen.textContent = 'Listen'; return; }

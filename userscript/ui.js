@@ -73,6 +73,7 @@ function startUi(SCOPE, PANEL_HTML, PANEL_CSS, UI_CSS, VERSION) {
       getTab: function () { return Promise.resolve({ id: 0, url: location.href }); },
       getStatus: function () { return api.ask({ type: 'shuteye-status' }); },
       read: function () { close(); api.ask({ type: 'shuteye-read' }); },
+      winding: function (on) { if (fab) fab.classList.toggle('winding', on); },
       canRead: function () { return !!siteBase; },
       openReader: function (src, cfg) {
         const url = siteBase + 'reader/' + (src ? '?src=' + encodeURIComponent(src) : '') +
@@ -179,6 +180,17 @@ function startUi(SCOPE, PANEL_HTML, PANEL_CSS, UI_CSS, VERSION) {
   api.storage.onChanged.addListener(function (changes) {
     if (changes.cfg) shareTheme(U.normalize(changes.cfg.newValue));
   });
+
+  // The corner fox yawns while wind-down is under way.
+  function checkWind() {
+    if (!fab || document.hidden) return;
+    api.storage.local.get('cfg').then(function (d) {
+      const cfg = U.normalize(d && d.cfg);
+      fab.classList.toggle('winding', cfg.enabled && U.windFactor(cfg, new Date()) > 0);
+    }).catch(function () { /* storage unavailable */ });
+  }
+  setInterval(checkWind, 60000);
+  setTimeout(checkWind, 2500);
 
   /* ---------- Start ---------- */
 

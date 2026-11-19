@@ -114,6 +114,8 @@ reader = reader
   .replace('<html lang="en">', '<html lang="en" data-shuteye-own>')
   .replace('<meta name="color-scheme" content="dark">', '<meta name="color-scheme" content="dark">\n  <meta name="shuteye-site" content="../">')
   .replace('<script src="shared.js"></script>', '<script src="web-api.js"></script>\n  <script src="shared.js"></script>');
+// A version tag on each file stops a browser mixing a new page with an old cached script.
+reader = reader.replace(/(src|href)="((?:web-api|shared|reader|reader-notes)\.(?:js|css)|vendor\/pdf\.min\.js)"/g, '$1="$2?v=' + VERSION + '"');
 fs.writeFileSync(path.join(OUT, 'reader', 'index.html'), reader);
 for (const f of ['reader.css', 'reader.js', 'reader-notes.js', 'shared.js']) fs.copyFileSync(path.join(EXT, f), path.join(OUT, 'reader', f));
 fs.copyFileSync(path.join(SRC, 'web-api.js'), path.join(OUT, 'reader', 'web-api.js'));

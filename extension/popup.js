@@ -80,6 +80,8 @@
       s.setProperty('--line', U.css(U.mix(p.bg, p.fg, 0.16)));
       s.setProperty('--sub', U.css(U.mix(p.fg, p.bg, 0.4)));
       env.wrap.classList.toggle('off', !cfg.enabled);
+      env.wrap.classList.toggle('winding', cfg.enabled && U.windFactor(cfg, new Date()) > 0);
+      if (env.winding) env.winding(cfg.enabled && U.windFactor(cfg, new Date()) > 0);
       paintToolbarIcon(p);
     }
 

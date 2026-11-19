@@ -364,6 +364,12 @@
       const last = positions[docKey];
       if (last && last.page > 1) { goTo(last.page); updateNear(); }
     }).catch(function (err) {
+      // Most sites only allow a plain request. Sites behind a login need the
+      // browser's sign-in sent along, so try that second.
+      if (source.url && !source.withCredentials && (!err || err.name !== 'InvalidPDFException')) {
+        open({ url: source.url, withCredentials: true }, name);
+        return;
+      }
       close();
       setProgress(null);
       $('empty').hidden = false;
@@ -392,7 +398,7 @@
 
   function openUrl(url) {
     if (!/^https?:\/\//i.test(url)) { showMessage('Paste a full link that starts with https://', true); return; }
-    open({ url: url, withCredentials: true }, nameFromUrl(url));
+    open({ url: url, withCredentials: false }, nameFromUrl(url));
   }
 
   /* ---------- Controls ---------- */
