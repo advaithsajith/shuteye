@@ -383,13 +383,14 @@
 
   /* ---------- Search ---------- */
 
-  const pageText = {};
+  const pageText = {}, rawText = {};
   let query = '', searchRun = 0;
 
   function textOf(n) {
     if (pageText[n] !== undefined) return Promise.resolve(pageText[n]);
     return pdf.getPage(n).then(function (page) { return page.getTextContent(); }).then(function (c) {
-      pageText[n] = c.items.map(function (i) { return i.str; }).join(' ').toLowerCase();
+      rawText[n] = c.items.map(function (i) { return i.str; }).join(' ');
+      pageText[n] = rawText[n].toLowerCase();
       return pageText[n];
     }).catch(function () { return ''; });
   }
@@ -430,6 +431,45 @@
 
   $('findForm').addEventListener('submit', function (e) { e.preventDefault(); search($('findInput').value); });
   $('findBtn').addEventListener('click', function () { openPanel('find'); setTimeout(function () { $('findInput').focus(); }, 30); });
+
+  /* ---------- Read aloud ---------- */
+
+  const voice = U.speaker();
+  const RATES = [1, 1.25, 1.5, 0.85];
+  let rateAt = 0;
+
+  function stopListening() {
+    voice.stop();
+    $('listenBtn').textContent = 'Listen';
+    $('listenBtn').setAttribute('aria-pressed', 'false');
+    $('rateBtn').hidden = true;
+    setTool(tool);            // puts the usual hint back
+  }
+  // Reads from the given page to the end of the document, turning pages as it goes.
+  function readFrom(n) {
+    if (!pdf) return;
+    textOf(n).then(function () {
+      if (!pdf || $('listenBtn').getAttribute('aria-pressed') !== 'true') return;
+      const text = (rawText[n] || '').trim();
+      const onward = function () { if (pdf && n < pdf.numPages) { R.goTo(n + 1); readFrom(n + 1); } else stopListening(); };
+      $('toolHint').textContent = 'Reading page ' + n + ' of ' + pdf.numPages + ' aloud.';
+      if (!text) { onward(); return; }
+      voice.say(text, onward);
+    });
+  }
+  $('listenBtn').hidden = !voice.supported;
+  $('listenBtn').addEventListener('click', function () {
+    if ($('listenBtn').getAttribute('aria-pressed') === 'true') { stopListening(); setTool(tool); return; }
+    $('listenBtn').textContent = 'Stop';
+    $('listenBtn').setAttribute('aria-pressed', 'true');
+    $('rateBtn').hidden = false;
+    readFrom(R.currentPage());
+  });
+  $('rateBtn').addEventListener('click', function () {
+    rateAt = (rateAt + 1) % RATES.length;
+    $('rateBtn').textContent = RATES[rateAt] + 'x';
+    voice.setRate(RATES[rateAt]);
+  });
 
   /* ---------- Save a copy of the PDF with the annotations drawn in ---------- */
 
@@ -517,7 +557,7 @@
   R.on('open', function (info) {
     pdf = info.pdf; key = info.key; docName = info.name;
     undoStack = []; query = '';
-    Object.keys(pageText).forEach(function (k) { delete pageText[k]; });
+    Object.keys(pageText).forEach(function (k) { delete pageText[k]; delete rawText[k]; });
     $('toolbar').hidden = false;
     $('findList').textContent = ''; $('findStatus').textContent = ''; $('saveStatus').textContent = '';
     api.storage.local.get('annotations').catch(function () { return {}; }).then(function (d) {
@@ -527,6 +567,7 @@
     });
   });
   R.on('close', function () {
+    stopListening();
     pdf = null; key = ''; anns = [];
     $('toolbar').hidden = true; $('panel').hidden = true;
     closeEdit(); list();

@@ -122,6 +122,13 @@
     transition: background-color 0.6s, color 0.6s, border-color 0.6s;
   }
   .lede { margin-top: 26px; font-size: 16px; }
+  .shared { display: flex; gap: 16px; align-items: center; margin-bottom: 30px; }
+  .shared .swatch { flex: none; width: 96px; height: 96px; border-radius: 22px; border: 2.5px solid var(--ink); display: flex; flex-direction: column; justify-content: space-between; padding: 12px; }
+  .shared .swatch b { font-size: 26px; font-style: italic; font-weight: 900; line-height: 1; }
+  .shared .swatch i { width: 30px; height: 8px; border-radius: 4px; display: block; }
+  .shared h3 { margin: 0 0 4px; font-size: 20px; }
+  .shared .go { margin-top: 10px; min-height: 46px; }
+  button.go { font-family: inherit; cursor: pointer; }
 
   .themes { list-style: none; display: flex; flex-wrap: wrap; gap: 7px; margin-top: 18px; }
   .themes li { border: 2px solid; border-radius: 999px; padding: 6px 13px 6px 10px; font-size: 12px; font-weight: 500; display: flex; align-items: center; gap: 7px; text-transform: lowercase; }
@@ -208,6 +215,17 @@
     <a class="pill" href="guide/">How to install</a>
     <span class="pill ver">v<!--VERSION--></span>
   </header>
+
+  <!-- Shown when the page is opened from a shared theme link -->
+  <div class="card shared" id="shared" hidden>
+    <div class="swatch" id="sharedSwatch"><b>Aa</b><i></i></div>
+    <div class="shared-text">
+      <h3 class="loud">Someone shared a theme</h3>
+      <p id="sharedName"></p>
+      <button type="button" class="go loud" id="sharedApply">Apply to ShutEye</button>
+      <p class="path" id="sharedStatus"></p>
+    </div>
+  </div>
 
   <h1 class="loud">Lights out for <em>every</em> website</h1>
   <div class="card lede rise">
@@ -322,6 +340,33 @@
 </div>
 
 <script>
+// A shared theme arrives as a code after #theme= in the address.
+(function () {
+  var m = /[#&]theme=([A-Za-z0-9_-]+)/.exec(location.hash);
+  if (!m) return;
+  var d;
+  try { d = JSON.parse(decodeURIComponent(escape(atob(m[1].replace(/-/g, '+').replace(/_/g, '/'))))); } catch (e) { return; }
+  var hex = /^#[0-9a-f]{6}$/i;
+  if (!d || !hex.test(d.bg) || !hex.test(d.fg) || !hex.test(d.ac)) return;
+  var sw = document.getElementById('sharedSwatch');
+  sw.style.background = d.bg; sw.style.color = d.fg; sw.lastElementChild.style.background = d.ac;
+  document.getElementById('sharedName').textContent = String(d.n || 'A custom theme').slice(0, 40);
+  document.getElementById('shared').hidden = false;
+  var status = document.getElementById('sharedStatus');
+  document.getElementById('sharedApply').addEventListener('click', function () {
+    var root = document.documentElement;
+    if (!root.getAttribute('data-shuteye-installed') && !root.hasAttribute('data-shuteye-ready')) {
+      status.textContent = 'Install ShutEye first (steps below), then open this link again.';
+    }
+    window.postMessage({ __shuteyeApply: m[1] }, location.origin);
+    var tries = 0;
+    (function check() {
+      if (root.getAttribute('data-shuteye-applied')) status.textContent = 'Applied. Open any website to see it.';
+      else if (++tries < 12) setTimeout(check, 250);
+    })();
+  });
+})();
+
 // The ShutEye userscript marks this page when it is installed.
 (function () {
   var tries = 0;

@@ -96,7 +96,7 @@
   // The settings for this page: the same as everywhere, unless the site has its own theme.
   function themed() {
     const rule = NR.siteRule(cfg, siteHost, sitePath());
-    return rule.theme ? Object.assign({}, cfg, { theme: rule.theme }) : cfg;
+    return NR.withWind(rule.theme ? Object.assign({}, cfg, { theme: rule.theme }) : cfg, new Date());
   }
 
   /* ---------- Reading mode ---------- */
@@ -891,7 +891,7 @@
   }
 
   if (sysDark.addEventListener) sysDark.addEventListener('change', function () { apply(true); });
-  setInterval(function () { if (cfg.schedule === 'time' && !doc.hidden) apply(true); }, 30000);
+  setInterval(function () { if ((cfg.schedule === 'time' || cfg.wind.on) && !doc.hidden) apply(true); }, 30000);
 
   doc.addEventListener('DOMContentLoaded', function () {
     bodySeen = true;
@@ -925,6 +925,24 @@
         return api.storage.local.set({ cfg: next });
       }).catch(function () { /* storage unavailable */ });
     }, true);
+  }
+
+  // A shared theme is applied from ShutEye's own website, when the visitor presses Apply there.
+  if (isTop && doc.documentElement.hasAttribute('data-shuteye-own') &&
+      (location.origin === new URL(NR.SITE).origin || location.hostname === 'localhost')) {
+    win.addEventListener('message', function (e) {
+      if (e.source !== win || !e.data || typeof e.data.__shuteyeApply !== 'string') return;
+      const theme = NR.readThemeCode(e.data.__shuteyeApply);
+      if (!theme) return;
+      api.storage.local.get('cfg').then(function (d) {
+        const next = NR.normalize(d && d.cfg);
+        next.theme = 'custom';
+        next.custom = theme.custom;
+        next.brightness = theme.brightness; next.contrast = theme.contrast; next.sepia = theme.sepia; next.gray = theme.gray;
+        return api.storage.local.set({ cfg: next });
+      }).then(function () { doc.documentElement.setAttribute('data-shuteye-applied', theme.name); })
+        .catch(function () { /* storage unavailable */ });
+    });
   }
 
   hello();

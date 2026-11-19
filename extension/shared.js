@@ -74,7 +74,8 @@
     images: 'smart',           // 'smart' | 'natural' | 'invert'
     sites: {},                 // "host" or "host/section" -> { mode: 'on' | 'off', images: 'natural' | 'invert', theme: a theme id }
     reader: { dark: true, keepPhotos: true },
-    reading: { font: 'serif', size: 19, width: 'normal' }    // reading mode
+    reading: { font: 'serif', size: 19, width: 'normal' },   // reading mode
+    wind: { on: false, at: '22:00', mins: 60 }               // wind-down: warmer and dimmer after bedtime
   };
 
   function clamp(n, lo, hi) { return Math.min(hi, Math.max(lo, n)); }
@@ -131,6 +132,11 @@
         font: oneOf(c.reading && c.reading.font, ['serif', 'sans', 'mono'], 'serif'),
         size: clamp(Math.round(Number(c.reading && c.reading.size) || 19), 14, 30),
         width: oneOf(c.reading && c.reading.width, ['narrow', 'normal', 'wide'], 'normal')
+      },
+      wind: {
+        on: !!(c.wind && c.wind.on === true),
+        at: validTime(c.wind && c.wind.at, '22:00'),
+        mins: clamp(Math.round(Number(c.wind && c.wind.mins) || 60), 10, 180)
       }
     };
     if (c.sites && typeof c.sites === 'object') {
@@ -491,7 +497,93 @@
     ctx.restore();
   }
 
+  /* ---------- Wind-down ----------
+   * From bedtime, pages drift warmer and dimmer over the chosen number of
+   * minutes, then stay that way until morning (eight hours after bedtime).
+   * Returns how far along we are, from 0 (not started) to 1 (fully wound down).
+   */
+  function windFactor(cfg, now) {
+    if (!cfg.wind || !cfg.wind.on) return 0;
+    const start = minutes(cfg.wind.at);
+    let since = now.getHours() * 60 + now.getMinutes() + now.getSeconds() / 60 - start;
+    if (since < 0) since += 1440;
+    if (since > 480) return 0;
+    return clamp(since / cfg.wind.mins, 0, 1);
+  }
+
+  // The settings as they should look right now, with wind-down applied.
+  function withWind(cfg, now) {
+    const f = windFactor(cfg, now);
+    if (!f) return cfg;
+    return Object.assign({}, cfg, {
+      brightness: Math.max(LIMITS.brightness[0], Math.round(cfg.brightness * (1 - 0.25 * f))),
+      sepia: Math.min(LIMITS.sepia[1], Math.round(cfg.sepia + 45 * f))
+    });
+  }
+
+  /* ---------- Sharing a theme ----------
+   * A theme travels as a short code at the end of a link to the ShutEye site.
+   * It carries colours and tuning only. Nothing about the sender.
+   */
+  const SITE = 'https://advaithsajith.github.io/shuteye/';
+
+  function themeCode(cfg) {
+    const p = palette(cfg);
+    const data = { n: p.name, bg: toHex(p.bg), fg: toHex(p.fg), ac: toHex(p.accent), b: cfg.brightness, c: cfg.contrast, s: cfg.sepia, g: cfg.gray };
+    return btoa(unescape(encodeURIComponent(JSON.stringify(data)))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  }
+  function themeLink(cfg) { return SITE + '#theme=' + themeCode(cfg); }
+
+  // Reads a shared code back. Returns null unless it is a well-formed theme.
+  function readThemeCode(code) {
+    try {
+      const d = JSON.parse(decodeURIComponent(escape(atob(String(code).replace(/-/g, '+').replace(/_/g, '/')))));
+      const bg = validHex(d.bg, null), fg = validHex(d.fg, null), ac = validHex(d.ac, null);
+      if (!bg || !fg || !ac) return null;
+      return {
+        name: String(d.n || 'Shared theme').replace(/[<>&"']/g, '').slice(0, 40),
+        custom: { bg: bg, fg: fg, accent: ac },
+        brightness: num(d.b, 'brightness'), contrast: num(d.c, 'contrast'), sepia: num(d.s, 'sepia'), gray: num(d.g, 'gray')
+      };
+    } catch (e) { return null; }
+  }
+
+  /* ---------- Reading aloud ----------
+   * Uses the device's own voice (the Web Speech API). Text is spoken sentence
+   * by sentence, because long passages get cut off on some devices.
+   */
+  function speaker() {
+    const synth = g.speechSynthesis;
+    let queue = [], at = 0, rate = 1, playing = false, run = 0, whenDone = null;
+    function split(text) {
+      const out = [];
+      (String(text).replace(/\s+/g, ' ').match(/[^.!?]+[.!?]*\s*/g) || []).forEach(function (s) {
+        const last = out[out.length - 1];
+        if (last && last.length + s.length < 230) out[out.length - 1] = last + s; else out.push(s);
+      });
+      return out.filter(function (s) { return s.trim(); });
+    }
+    function next() {
+      if (!playing) return;
+      if (at >= queue.length) { playing = false; const f = whenDone; whenDone = null; if (f) f(); return; }
+      const u = new g.SpeechSynthesisUtterance(queue[at]), mine = run;
+      u.rate = rate;
+      if (document.documentElement.lang) u.lang = document.documentElement.lang;
+      u.onend = u.onerror = function () { if (mine !== run) return; at++; next(); };
+      synth.speak(u);
+    }
+    function stop() { run++; playing = false; whenDone = null; if (synth) synth.cancel(); }
+    return {
+      supported: !!(synth && g.SpeechSynthesisUtterance),
+      say: function (text, done) { stop(); queue = split(text); at = 0; playing = true; whenDone = done || null; next(); },
+      stop: stop,
+      isPlaying: function () { return playing; },
+      setRate: function (r) { rate = r; if (playing) { run++; synth.cancel(); next(); } }
+    };
+  }
+
   g.ShutEye = {
+    SITE, windFactor, withWind, themeLink, readThemeCode, speaker,
     api, THEMES, ANIMATIONS, LIMITS, DEFAULTS, REVERSE, FOX,
     normalize, themeById, cleanHost, sectionOf, siteRule, setSiteRule, scheduleOn,
     palette, tone, matrix, mapColor, preimage,

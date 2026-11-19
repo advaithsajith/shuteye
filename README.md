@@ -47,6 +47,9 @@ switch it off.
 - **PDF annotation**: highlight, underline and strike through text, draw with a pen, pin notes and type on the page. A side panel lists every annotation and the PDF's outline, and you can save a copy of the PDF with the annotations drawn in.
 - **Reading mode**: one tap (or Alt+Shift+R) shows just the article in your theme, with your choice of typeface, text size and column width. Menus, sidebars and comment sections are left out.
 - **A theme per site**: Dracula on one site, Ember on another, whatever your everyday theme is.
+- **Wind-down**: from a bedtime you set, pages drift warmer and dimmer over an hour and stay that way until morning.
+- **Share a theme**: turn your current look into a link. Anyone with ShutEye can open it and apply it in one tap.
+- **Read aloud**: the PDF reader and reading mode can read to you in the device's own voice, at four speeds.
 - **Black and white mode** and a keyboard switch (Alt+Shift+D on a computer).
 
 ## Two ways to install

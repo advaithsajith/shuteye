@@ -48,6 +48,11 @@ MAKE IT YOURS
 READING MODE
 One click shows just the article, in your theme, with your choice of typeface, text size and column width. Menus, sidebars and comment sections are left out. Nothing is sent anywhere: the article is taken from the page you already have open.
 
+WIND DOWN, LISTEN, SHARE
+• Wind-down: from a bedtime you set, pages drift warmer and dimmer over an hour.
+• Read aloud: reading mode and the PDF reader can read to you using your device's own voice.
+• Share a theme: turn your look into a link that a friend can apply in one click.
+
 STAY IN CONTROL
 • Per-site rules: Auto, Always or Never, for a whole site or one section of it (Google Docs but not Sheets, for example). Each site can also have its own theme.
 • Schedule: always on, follow your system's light and dark appearance, or set your own hours.
@@ -178,7 +183,7 @@ https://advaithsajith.github.io/shuteye/privacy/
   Expect it to take from a few days up to a few weeks.
 - The most common reason for rejection is a description that does not match
   what the extension does, or a permission without a clear reason. The text
-  above was written to match the code as it stands at version 1.2.0.
+  above was written to match the code as it stands at version 1.3.0.
 - If Google asks why ShutEye needs every site, the host permission
   justification above is the answer to send.
 

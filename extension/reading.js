@@ -23,7 +23,7 @@
   };
   const WIDTHS = { narrow: 560, normal: 700, wide: 900 };
 
-  let host = null, root = null, wrap = null, opts = null, prevOverflow = '';
+  let host = null, root = null, wrap = null, opts = null, prevOverflow = '', stopVoice = null;
 
   function textLen(el) { return (el.textContent || '').replace(/\s+/g, ' ').trim().length; }
 
@@ -211,10 +211,20 @@
       const order = ['narrow', 'normal', 'wide'];
       change({ width: order[(order.indexOf(opts.cfg.reading.width) + 1) % 3] });
     }));
-    wrap.appendChild(bar);
-
     const article = document.createElement('div');
     article.className = 'doc';
+    const voice = NR.speaker();
+    if (voice.supported) {
+      const listen = button('Listen', 'Read the article aloud', function () {
+        if (voice.isPlaying()) { voice.stop(); listen.textContent = 'Listen'; return; }
+        listen.textContent = 'Stop';
+        voice.say(article.innerText || article.textContent, function () { listen.textContent = 'Listen'; });
+      });
+      bar.insertBefore(listen, bar.children[2]);
+      stopVoice = function () { voice.stop(); };
+    }
+    wrap.appendChild(bar);
+
     if (source) {
       const h = document.createElement('h1');
       h.className = 'title';
@@ -246,6 +256,7 @@
 
   function close() {
     if (!host) return;
+    if (stopVoice) { stopVoice(); stopVoice = null; }
     document.removeEventListener('keydown', onKey, true);
     host.remove();
     host = root = wrap = null;

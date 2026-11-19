@@ -221,6 +221,19 @@
       });
     });
 
+    // Share the current look as a link. Opening it on another device offers to apply it.
+    $('shareBtn').addEventListener('click', function () {
+      const link = U.themeLink(cfg), box = $('shareLink'), status = $('shareStatus');
+      box.value = link; box.hidden = false; status.hidden = false;
+      const copied = function () { status.textContent = 'Link copied. Anyone with ShutEye can open it to get this theme.'; };
+      const manual = function () { status.textContent = 'Copy this link and send it:'; box.focus(); box.select(); };
+      if (navigator.share && /iPhone|iPad|Android/i.test(navigator.userAgent)) {
+        navigator.share({ title: 'A ShutEye theme', url: link }).then(function () { status.textContent = 'Shared.'; }, manual);
+      } else if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(link).then(copied, manual);
+      } else manual();
+    });
+
     /* ---------- Fine-tune ---------- */
 
     const pctLabel = function (v) { return v + '%'; };
@@ -286,6 +299,11 @@
       });
     });
 
+    const setWind = toggle('windOn', function () { return cfg.wind.on; }, function (v) { cfg.wind.on = v; });
+    $('windAt').addEventListener('change', function (e) {
+      if (/^\d\d:\d\d$/.test(e.target.value)) { cfg.wind.at = e.target.value; renderAll(); save(); }
+    });
+
     /* ---------- Sites ---------- */
 
     const setAutoDetect = toggle('autoDetect', function () { return cfg.autoDetect; }, function (v) { cfg.autoDetect = v; });
@@ -339,10 +357,13 @@
         : cfg.schedule === 'system' ? 'ShutEye runs while your device is in Dark mode, so it follows sunset if Appearance is set to Automatic.'
         : 'ShutEye runs between these hours every day.';
       $('times').hidden = cfg.schedule !== 'time';
+      $('windTimes').hidden = !cfg.wind.on;
 
       const n = Object.keys(cfg.sites).length;
       $('sitesSummary').textContent = n === 0 ? 'No rules' : n + (n === 1 ? ' rule' : ' rules');
-      $('tagline').textContent = cfg.enabled ? 'Lights out for every website' : 'Wide awake (switched off)';
+      const wound = U.windFactor(cfg, new Date());
+      $('tagline').textContent = !cfg.enabled ? 'Wide awake (switched off)'
+        : wound >= 1 ? 'Wound down for the night' : wound > 0 ? 'Winding down\u2026 ' + Math.round(wound * 100) + '%' : 'Lights out for every website';
     }
 
     function renderAll() {
@@ -356,6 +377,8 @@
       setSchedule(cfg.schedule);
       $('timeFrom').value = cfg.timeFrom;
       $('timeTo').value = cfg.timeTo;
+      setWind();
+      $('windAt').value = cfg.wind.at;
       setAutoDetect(); setListedOnly();
       renderRules();
       renderSummaries();

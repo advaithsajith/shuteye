@@ -73,6 +73,9 @@
       <label><input type="color" id="cFg"><span>Text</span></label>
       <label><input type="color" id="cAccent"><span>Accent</span></label>
     </div>
+    <button type="button" class="link" id="shareBtn">Share this theme</button>
+    <p class="hint" id="shareStatus" hidden></p>
+    <input type="text" id="shareLink" class="sharelink" readonly hidden aria-label="Link to this theme">
   </section>
 
   <details class="card" id="tuneCard">
@@ -137,6 +140,11 @@
     <div class="times" id="times" hidden>
       <label>From <input type="time" id="timeFrom"></label>
       <label>Until <input type="time" id="timeTo"></label>
+    </div>
+    <label class="row"><span>Wind down at bedtime<small>Pages drift warmer and dimmer over an hour, then stay that way until morning</small></span>
+      <span class="switch small"><input type="checkbox" id="windOn"><span class="track"><span class="thumb"></span></span></span></label>
+    <div class="times" id="windTimes" hidden>
+      <label>Bedtime <input type="time" id="windAt"></label>
     </div>
   </details>
 
