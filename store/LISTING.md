@@ -45,8 +45,11 @@ MAKE IT YOURS
 • Fine-tune brightness, contrast and warmth, and dim bright photos for late-night reading.
 • Choose how pages switch: Blink, Ripple, Fade, Curtain or Mist.
 
+READING MODE
+One click shows just the article, in your theme, with your choice of typeface, text size and column width. Menus, sidebars and comment sections are left out. Nothing is sent anywhere: the article is taken from the page you already have open.
+
 STAY IN CONTROL
-• Per-site rules: Auto, Always or Never, for a whole site or one section of it (Google Docs but not Sheets, for example).
+• Per-site rules: Auto, Always or Never, for a whole site or one section of it (Google Docs but not Sheets, for example). Each site can also have its own theme.
 • Schedule: always on, follow your system's light and dark appearance, or set your own hours.
 • "Only darken sites I pick" mode for people who want it on just a few sites.
 
@@ -175,7 +178,7 @@ https://advaithsajith.github.io/shuteye/privacy/
   Expect it to take from a few days up to a few weeks.
 - The most common reason for rejection is a description that does not match
   what the extension does, or a permission without a clear reason. The text
-  above was written to match the code as it stands at version 1.1.0.
+  above was written to match the code as it stands at version 1.2.0.
 - If Google asks why ShutEye needs every site, the host permission
   justification above is the answer to send.
 

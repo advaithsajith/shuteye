@@ -33,6 +33,10 @@ let content = read(EXT, 'content.js');
 must(content, 'globalThis.ShutEye', 'ShutEye in content.js');
 content = content.replace(/globalThis\./g, 'SCOPE.');
 
+let readingJs = read(EXT, 'reading.js');
+must(readingJs, 'globalThis.ShutEyeReading', 'ShutEyeReading in reading.js');
+readingJs = readingJs.replace(/globalThis\./g, 'SCOPE.');
+
 let panelJs = read(EXT, 'popup.js');
 must(panelJs, '})(globalThis);', 'the end of popup.js');
 panelJs = panelJs.replace('})(globalThis);', '})(SCOPE);');
@@ -85,6 +89,8 @@ const SCOPE = { __shuteyeEmbed: true, __shuteyeApi: makeApi() };
 
 /* ===== extension/shared.js ===== */
 ${shared}
+/* ===== extension/reading.js ===== */
+${readingJs}
 /* ===== extension/content.js ===== */
 ${content}
 /* ===== extension/popup.js ===== */

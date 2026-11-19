@@ -81,6 +81,7 @@
   function decide() {
     // ShutEye's own pages (install page, web reader) style themselves.
     if (doc.documentElement.hasAttribute('data-shuteye-own')) return 'off-dark';
+    if (reading()) return 'off-reading';      // reading mode draws the theme itself
     if (!cfg.enabled) return 'off-global';
     if (!NR.scheduleOn(cfg, new Date(), sysDark.matches)) return 'off-schedule';
     const rule = NR.siteRule(cfg, siteHost, sitePath());
@@ -90,6 +91,35 @@
     const forced = isTop && rule.mode === 'on';
     if (!forced && cfg.autoDetect && pageDark === true && !isPdfDoc) return 'off-dark';
     return 'on';
+  }
+
+  // The settings for this page: the same as everywhere, unless the site has its own theme.
+  function themed() {
+    const rule = NR.siteRule(cfg, siteHost, sitePath());
+    return rule.theme ? Object.assign({}, cfg, { theme: rule.theme }) : cfg;
+  }
+
+  /* ---------- Reading mode ---------- */
+
+  function reading() { return !!(globalThis.ShutEyeReading && globalThis.ShutEyeReading.isOpen()); }
+
+  function toggleReading() {
+    const view = globalThis.ShutEyeReading;
+    if (!view || !isTop) return false;
+    if (view.isOpen()) { view.close(); return false; }
+    view.open({
+      cfg: JSON.parse(JSON.stringify(themed())),
+      onClose: function () { apply(); },
+      save: function (prefs) {
+        api.storage.local.get('cfg').then(function (d) {
+          const next = NR.normalize(d && d.cfg);
+          next.reading = prefs;
+          return api.storage.local.set({ cfg: next });
+        }).catch(function () { /* storage unavailable */ });
+      }
+    });
+    apply();
+    return true;
   }
 
   function childCtx() { return mode === 'full' || mode === 'rev' || ctxActive; }
@@ -107,7 +137,8 @@
     const rule = NR.siteRule(cfg, siteHost, sitePath());
     imagesMode = isPdfDoc ? 'invert' : (rule.images || cfg.images);
 
-    const look = mode + '|' + cfg.theme + '|' + cfg.tint + '|' + (cfg.theme === 'custom' ? cfg.custom.bg + cfg.custom.fg : '');
+    const shown = themed();
+    const look = mode + '|' + shown.theme + '|' + cfg.tint + '|' + (shown.theme === 'custom' ? cfg.custom.bg + cfg.custom.fg : '');
     const moving = animate === true && isTop && look !== lastLook && (mode === 'full' || prevMode === 'full') &&
       cfg.anim !== 'none' && !doc.hidden && !!doc.body && typeof doc.startViewTransition === 'function' && !calm.matches;
     lastLook = look;
@@ -200,7 +231,7 @@
   // The theme recipe for this frame. Colour tint needs a solid page background to
   // blend with, and only the outermost darkened frame applies it.
   function currentTone() {
-    return NR.tone(cfg, mode === 'full' && !ctxActive && canBlend && !!baseColour());
+    return NR.tone(themed(), mode === 'full' && !ctxActive && canBlend && !!baseColour());
   }
 
   const LAYER = ' { display: block !important; position: fixed !important; top: -120px !important;' +
@@ -844,6 +875,7 @@
     if (changes.darkHosts) darkHosts = changes.darkHosts.newValue || {};
     if (changes.cfg) {
       cfg = NR.normalize(changes.cfg.newValue);
+      if (reading()) globalThis.ShutEyeReading.update(JSON.parse(JSON.stringify(themed())));
       apply(true);
       if (!isTop) setTimeout(hello, 200);
     }
@@ -852,6 +884,7 @@
   // The popup asks the top frame what is going on.
   if (api.runtime && api.runtime.onMessage) {
     api.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
+      if (isTop && msg && msg.type === 'shuteye-read') { sendResponse({ reading: toggleReading() }); return; }
       if (!isTop || !msg || msg.type !== 'shuteye-status') return;
       sendResponse({ host: siteHost, reason: reason, active: mode === 'full', pageDark: pageDark, isPdf: isPdfDoc, url: location.href });
     });
@@ -880,9 +913,10 @@
   win.addEventListener('pageshow', function (e) { if (e.persisted) load(); });
   win.addEventListener('popstate', function () { if (lastPath !== sitePath()) { lastPath = sitePath(); apply(); } });
 
-  // Alt+Shift+D switches ShutEye on and off from the keyboard.
+  // Alt+Shift+D switches ShutEye on and off from the keyboard. Alt+Shift+R opens reading mode.
   if (isTop) {
     doc.addEventListener('keydown', function (e) {
+      if (e.altKey && e.shiftKey && e.code === 'KeyR' && !e.repeat) { e.preventDefault(); toggleReading(); return; }
       if (!e.altKey || !e.shiftKey || e.code !== 'KeyD' || e.repeat) return;
       e.preventDefault();
       api.storage.local.get('cfg').then(function (d) {

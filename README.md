@@ -45,6 +45,8 @@ switch it off.
 - **Schedule**: always on, follow the device's Light/Dark appearance, or set hours.
 - **Dark PDF reader** with your theme, text selection and search. It remembers your page in each book.
 - **PDF annotation**: highlight, underline and strike through text, draw with a pen, pin notes and type on the page. A side panel lists every annotation and the PDF's outline, and you can save a copy of the PDF with the annotations drawn in.
+- **Reading mode**: one tap (or Alt+Shift+R) shows just the article in your theme, with your choice of typeface, text size and column width. Menus, sidebars and comment sections are left out.
+- **A theme per site**: Dracula on one site, Ember on another, whatever your everyday theme is.
 - **Black and white mode** and a keyboard switch (Alt+Shift+D on a computer).
 
 ## Two ways to install

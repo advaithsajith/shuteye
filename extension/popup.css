@@ -228,6 +228,12 @@ footer { text-align: center; color: var(--sub); font-size: 12px; padding: 4px 8p
   *, *::before, *::after { animation: none !important; transition-duration: 0.01ms !important; }
 }
 
+.pick {
+  flex: 1; max-width: 228px; min-height: 40px; padding: 6px 12px; border-radius: 999px; border: 1px solid var(--line);
+  background: var(--bg); color: var(--fg); font: inherit; font-size: 12.5px; color-scheme: dark;
+}
+.pick:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
 /* ---------- Brand layer ----------
  * ShutEye's look: monospace type, loud italic capitals for headings, thin
  * outlined boxes and capsule buttons. Flat, with the theme's three colours only.

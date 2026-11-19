@@ -108,7 +108,8 @@
       'off-global': 'ShutEye is switched off',
       'off-site': 'Switched off for this site',
       'off-list': 'Not one of your picked sites',
-      'off-dark': 'Already dark, left as it is'
+      'off-dark': 'Already dark, left as it is',
+      'off-reading': 'Reading mode is open'
     };
 
     // Rules are saved for the whole site, or for one section of it ("host/section").
@@ -150,7 +151,23 @@
       const rule = cfg.sites[ruleKey()] || {};
       setSiteMode(rule.mode || 'auto');
       setSiteImages(rule.images || 'default');
+      $('siteTheme').value = rule.theme || '';
     }
+
+    // A site can wear its own theme, whatever the theme is everywhere else.
+    (function () {
+      const pick = $('siteTheme');
+      const option = function (value, label) { const o = document.createElement('option'); o.value = value; o.textContent = label; pick.appendChild(o); };
+      option('', 'Same as everywhere');
+      U.THEMES.forEach(function (t) { option(t.id, t.name); });
+      option('custom', 'Custom');
+      pick.addEventListener('change', function () {
+        U.setSiteRule(cfg, ruleKey(), { theme: pick.value || null });
+        renderAll(); save();
+      });
+    })();
+
+    $('readBtn').addEventListener('click', function () { env.read(tab); });
 
     /* ---------- Themes ---------- */
 
@@ -283,6 +300,7 @@
         const r = cfg.sites[h], bits = [];
         if (r.mode) bits.push(r.mode === 'on' ? 'Always' : 'Never');
         if (r.images) bits.push(r.images === 'natural' ? 'Natural images' : 'Dark images');
+        if (r.theme) bits.push(r.theme === 'custom' ? 'Custom theme' : (U.themeById(r.theme) || {}).name);
         const li = document.createElement('li');
         const name = document.createElement('span'); name.className = 'host'; name.textContent = h;
         const tag = document.createElement('span'); tag.className = 'tag'; tag.textContent = bits.join(' · ');
@@ -391,6 +409,10 @@
       getStatus: function (tab) {
         if (!tab || tab.id === undefined || !api.tabs.sendMessage) return Promise.resolve(null);
         return api.tabs.sendMessage(tab.id, { type: 'shuteye-status' }, { frameId: 0 });
+      },
+      read: function (tab) {
+        if (!tab || tab.id === undefined) return;
+        api.tabs.sendMessage(tab.id, { type: 'shuteye-read' }, { frameId: 0 }).then(function () { window.close(); }, function () { /* page not ready */ });
       },
       canRead: function () { return true; },
       openReader: function (src) {

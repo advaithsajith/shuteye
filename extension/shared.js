@@ -72,8 +72,9 @@
     anim: 'blink',
     animMs: 500,
     images: 'smart',           // 'smart' | 'natural' | 'invert'
-    sites: {},                 // "host" or "host/section" -> { mode: 'on' | 'off', images: 'natural' | 'invert' }
-    reader: { dark: true, keepPhotos: true }
+    sites: {},                 // "host" or "host/section" -> { mode: 'on' | 'off', images: 'natural' | 'invert', theme: a theme id }
+    reader: { dark: true, keepPhotos: true },
+    reading: { font: 'serif', size: 19, width: 'normal' }    // reading mode
   };
 
   function clamp(n, lo, hi) { return Math.min(hi, Math.max(lo, n)); }
@@ -125,6 +126,11 @@
       reader: {
         dark: !(c.reader && c.reader.dark === false),
         keepPhotos: !(c.reader && c.reader.keepPhotos === false)
+      },
+      reading: {
+        font: oneOf(c.reading && c.reading.font, ['serif', 'sans', 'mono'], 'serif'),
+        size: clamp(Math.round(Number(c.reading && c.reading.size) || 19), 14, 30),
+        width: oneOf(c.reading && c.reading.width, ['narrow', 'normal', 'wide'], 'normal')
       }
     };
     if (c.sites && typeof c.sites === 'object') {
@@ -133,7 +139,8 @@
         const rule = {};
         if (r.mode === 'on' || r.mode === 'off') rule.mode = r.mode;
         if (r.images === 'natural' || r.images === 'invert') rule.images = r.images;
-        if (rule.mode || rule.images) out.sites[cleanHost(host)] = rule;
+        if (r.theme === 'custom' || themeById(r.theme)) rule.theme = r.theme;
+        if (rule.mode || rule.images || rule.theme) out.sites[cleanHost(host)] = rule;
       }
     }
     return out;
@@ -157,7 +164,7 @@
   function siteRule(cfg, host, path) {
     let h = cleanHost(host);
     const sites = cfg.sites || {}, section = sectionOf(path);
-    const found = function (key) { return { key: key, mode: sites[key].mode || 'auto', images: sites[key].images || null }; };
+    const found = function (key) { return { key: key, mode: sites[key].mode || 'auto', images: sites[key].images || null, theme: sites[key].theme || null }; };
     while (h) {
       if (section && Object.prototype.hasOwnProperty.call(sites, h + '/' + section)) return found(h + '/' + section);
       if (Object.prototype.hasOwnProperty.call(sites, h)) return found(h);
@@ -165,7 +172,7 @@
       if (dot < 0 || h.indexOf('.', dot + 1) < 0) break;   // stop before the bare TLD
       h = h.slice(dot + 1);
     }
-    return { key: null, mode: 'auto', images: null };
+    return { key: null, mode: 'auto', images: null, theme: null };
   }
 
   function setSiteRule(cfg, host, patch) {
@@ -174,7 +181,8 @@
     const next = Object.assign({}, cfg.sites[h], patch);
     if (next.mode !== 'on' && next.mode !== 'off') delete next.mode;
     if (next.images !== 'natural' && next.images !== 'invert') delete next.images;
-    if (next.mode || next.images) cfg.sites[h] = next; else delete cfg.sites[h];
+    if (next.theme !== 'custom' && !themeById(next.theme)) delete next.theme;
+    if (next.mode || next.images || next.theme) cfg.sites[h] = next; else delete cfg.sites[h];
   }
 
   /* ---------- Schedule ---------- */

@@ -72,6 +72,7 @@ function startUi(SCOPE, PANEL_HTML, PANEL_CSS, UI_CSS, VERSION) {
       U: U, root: root, vars: host, wrap: root.getElementById('seWrap'), html: setHtml,
       getTab: function () { return Promise.resolve({ id: 0, url: location.href }); },
       getStatus: function () { return api.ask({ type: 'shuteye-status' }); },
+      read: function () { close(); api.ask({ type: 'shuteye-read' }); },
       canRead: function () { return !!siteBase; },
       openReader: function (src, cfg) {
         const url = siteBase + 'reader/' + (src ? '?src=' + encodeURIComponent(src) : '') +
