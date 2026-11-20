@@ -73,9 +73,19 @@
       <label><input type="color" id="cFg"><span>Text</span></label>
       <label><input type="color" id="cAccent"><span>Accent</span></label>
     </div>
+    <form class="inline" id="mineForm" hidden>
+      <input type="text" id="mineName" maxlength="30" placeholder="Name this theme" aria-label="Name for this theme">
+      <button type="submit">Save to my themes</button>
+    </form>
+    <button type="button" class="link" id="mineDelete" hidden>Delete this theme</button>
     <button type="button" class="link" id="shareBtn">Share this theme</button>
     <p class="hint" id="shareStatus" hidden></p>
     <input type="text" id="shareLink" class="sharelink" readonly hidden aria-label="Link to this theme">
+    <form class="inline" id="importForm">
+      <input type="text" id="importCode" placeholder="Paste a theme link" aria-label="Paste a theme link or code" autocapitalize="off" autocorrect="off" spellcheck="false">
+      <button type="submit">Add</button>
+    </form>
+    <p class="hint" id="importStatus" hidden></p>
   </section>
 
   <details class="card" id="tuneCard">
@@ -156,6 +166,19 @@
       <span class="switch small"><input type="checkbox" id="listedOnly"><span class="track"><span class="thumb"></span></span></span></label>
     <ul class="rules" id="rules"></ul>
     <p class="hint" id="rulesEmpty">No site rules yet. Use "This site" above to add one.</p>
+  </details>
+
+  <details class="card" id="backupCard">
+    <summary><h2>Backup</h2><span class="sub">Settings, themes, site rules</span></summary>
+    <p class="hint" style="margin-top:0">Save everything to a file, or move it to another device. PDF annotations are not included.</p>
+    <div class="pair">
+      <button type="button" class="ghost" id="backupSave">Save a backup</button>
+      <button type="button" class="ghost" id="backupLoad">Restore from file</button>
+    </div>
+    <input type="file" id="backupFile" accept="application/json,.json,.txt" hidden>
+    <textarea id="backupText" rows="3" placeholder="Or paste backup text here, then press Restore from text" aria-label="Backup text" spellcheck="false"></textarea>
+    <button type="button" class="link" id="backupPaste">Restore from text</button>
+    <p class="hint" id="backupStatus" hidden></p>
   </details>
 
   <button type="button" class="ghost" id="readerBtn">Open the dark PDF reader</button>

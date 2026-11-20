@@ -31,7 +31,18 @@
     { id: 'onedark',   name: 'One Dark',    bg: '#282c34', fg: '#c8ccd4', accent: '#61afef' },
     { id: 'rosepine',  name: 'Rosé Pine',   bg: '#191724', fg: '#e0def4', accent: '#ebbcba' },
     { id: 'synthwave', name: 'Synthwave',   bg: '#241b2f', fg: '#f6eefc', accent: '#ff7edb' },
-    { id: 'phosphor',  name: 'Phosphor',    bg: '#030b05', fg: '#bdf5c8', accent: '#39ff7a' }
+    { id: 'phosphor',  name: 'Phosphor',    bg: '#030b05', fg: '#bdf5c8', accent: '#39ff7a' },
+    { id: 'ayu',       name: 'Ayu Dark',    bg: '#0b0e14', fg: '#bfbdb6', accent: '#e6b450' },
+    { id: 'nightowl',  name: 'Night Owl',   bg: '#011627', fg: '#d6deeb', accent: '#82aaff' },
+    { id: 'everforest', name: 'Everforest', bg: '#2d353b', fg: '#d3c6aa', accent: '#a7c080' },
+    { id: 'kanagawa',  name: 'Kanagawa',    bg: '#1f1f28', fg: '#dcd7ba', accent: '#7e9cd8' },
+    { id: 'ocean',     name: 'Material Ocean', bg: '#0f111a', fg: '#a6accd', accent: '#82aaff' },
+    { id: 'githubdark', name: 'GitHub Dark', bg: '#0d1117', fg: '#e6edf3', accent: '#58a6ff' },
+    { id: 'cobalt',    name: 'Cobalt',      bg: '#193549', fg: '#e1efff', accent: '#ffc600' },
+    { id: 'papernight', name: 'Paper Night', bg: '#22201d', fg: '#d9d3c7', accent: '#c9a26b', note: 'Soft warm gray for reading' },
+    { id: 'ink',       name: 'Ink',         bg: '#0e1626', fg: '#efe6d0', accent: '#e0b973', note: 'Deep navy with cream text' },
+    { id: 'moss',      name: 'Moss',        bg: '#1a211c', fg: '#d6dfd0', accent: '#8fbf7f' },
+    { id: 'contrast',  name: 'High Contrast', bg: '#000000', fg: '#ffffff', accent: '#ffe600', note: 'Black, white and yellow for low vision' }
   ];
 
   // How a page changes when ShutEye switches on or off.
@@ -62,6 +73,7 @@
     autoDetect: true,          // leave sites alone that are already dark
     theme: 'midnight',         // a THEMES id, or 'custom'
     custom: { bg: '#14161f', fg: '#e6e9f5', accent: '#ff9d5c' },
+    mine: [],                  // themes the user saved: { id, name, bg, fg, accent }
     brightness: 100,           // fine-tuning on top of the theme
     contrast: 100,
     sepia: 0,                  // warmth
@@ -96,18 +108,56 @@
     return null;
   }
 
+  // Any theme by id: a built-in one, one the user saved ("My themes"), or the Custom slot.
+  function findTheme(cfg, id) {
+    if (id === 'custom') return { id: 'custom', name: 'Custom', bg: cfg.custom.bg, fg: cfg.custom.fg, accent: cfg.custom.accent };
+    const mine = cfg.mine || [];
+    for (let i = 0; i < mine.length; i++) if (mine[i].id === id) return mine[i];
+    return themeById(id);
+  }
+
+  // Saves a look into "My themes" and returns its id. The same look is not saved twice.
+  function addMine(cfg, look) {
+    const name = String(look.name || 'My theme').replace(/[<>&"']/g, '').trim().slice(0, 30) || 'My theme';
+    const bg = validHex(look.bg, null), fg = validHex(look.fg, null), accent = validHex(look.accent, null);
+    if (!bg || !fg || !accent) return cfg.theme;
+    for (let i = 0; i < cfg.mine.length; i++) {
+      const m = cfg.mine[i];
+      if (m.name === name && m.bg === bg && m.fg === fg && m.accent === accent) return m.id;
+    }
+    if (cfg.mine.length >= 40) cfg.mine.shift();
+    const id = 'm_' + Date.now().toString(36) + Math.floor(Math.random() * 1296).toString(36);
+    cfg.mine.push({ id: id, name: name, bg: bg, fg: fg, accent: accent });
+    return id;
+  }
+
+  function removeMine(cfg, id) {
+    cfg.mine = cfg.mine.filter(function (m) { return m.id !== id; });
+    if (cfg.theme === id) cfg.theme = DEFAULTS.theme;
+    Object.keys(cfg.sites).forEach(function (h) { if (cfg.sites[h].theme === id) setSiteRule(cfg, h, { theme: null }); });
+  }
+
   // Always returns a complete, valid settings object, whatever was stored.
   function normalize(raw) {
     const c = (raw && typeof raw === 'object') ? raw : {};
     const cc = (c.custom && typeof c.custom === 'object') ? c.custom : {};
+    const mine = [];
+    (Array.isArray(c.mine) ? c.mine : []).slice(0, 40).forEach(function (m) {
+      if (!m || !/^m_[a-z0-9]{3,20}$/.test(m.id || '')) return;
+      const bg = validHex(m.bg, null), fg = validHex(m.fg, null), accent = validHex(m.accent, null);
+      if (!bg || !fg || !accent || mine.some(function (x) { return x.id === m.id; })) return;
+      mine.push({ id: m.id, name: String(m.name || 'My theme').replace(/[<>&"']/g, '').slice(0, 30) || 'My theme', bg: bg, fg: fg, accent: accent });
+    });
+    const known = function (id) { return id === 'custom' || !!themeById(id) || mine.some(function (m) { return m.id === id; }); };
     const out = {
+      mine: mine,
       enabled: c.enabled !== false,
       schedule: oneOf(c.schedule, ['always', 'system', 'time'], DEFAULTS.schedule),
       timeFrom: validTime(c.timeFrom, DEFAULTS.timeFrom),
       timeTo: validTime(c.timeTo, DEFAULTS.timeTo),
       defaultMode: oneOf(c.defaultMode, ['all', 'listed'], DEFAULTS.defaultMode),
       autoDetect: c.autoDetect !== false,
-      theme: (c.theme === 'custom' || themeById(c.theme)) ? c.theme : DEFAULTS.theme,
+      theme: known(c.theme) ? c.theme : DEFAULTS.theme,
       custom: {
         bg: validHex(cc.bg, DEFAULTS.custom.bg),
         fg: validHex(cc.fg, DEFAULTS.custom.fg),
@@ -145,7 +195,7 @@
         const rule = {};
         if (r.mode === 'on' || r.mode === 'off') rule.mode = r.mode;
         if (r.images === 'natural' || r.images === 'invert') rule.images = r.images;
-        if (r.theme === 'custom' || themeById(r.theme)) rule.theme = r.theme;
+        if (known(r.theme)) rule.theme = r.theme;
         if (rule.mode || rule.images || rule.theme) out.sites[cleanHost(host)] = rule;
       }
     }
@@ -187,7 +237,7 @@
     const next = Object.assign({}, cfg.sites[h], patch);
     if (next.mode !== 'on' && next.mode !== 'off') delete next.mode;
     if (next.images !== 'natural' && next.images !== 'invert') delete next.images;
-    if (next.theme !== 'custom' && !themeById(next.theme)) delete next.theme;
+    if (!next.theme || !findTheme(cfg, next.theme)) delete next.theme;
     if (next.mode || next.images || next.theme) cfg.sites[h] = next; else delete cfg.sites[h];
   }
 
@@ -242,10 +292,10 @@
 
   // The active palette as [r,g,b] arrays.
   function palette(cfg) {
-    const t = cfg.theme === 'custom' ? cfg.custom : (themeById(cfg.theme) || THEMES[1]);
+    const t = findTheme(cfg, cfg.theme) || THEMES[1];
     return {
       id: cfg.theme,
-      name: cfg.theme === 'custom' ? 'Custom' : t.name,
+      name: t.name,
       bg: hex(t.bg), fg: hex(t.fg), accent: hex(t.accent)
     };
   }
@@ -583,7 +633,7 @@
   }
 
   g.ShutEye = {
-    SITE, windFactor, withWind, themeLink, readThemeCode, speaker,
+    SITE, windFactor, withWind, themeLink, readThemeCode, speaker, findTheme, addMine, removeMine,
     api, THEMES, ANIMATIONS, LIMITS, DEFAULTS, REVERSE, FOX,
     normalize, themeById, cleanHost, sectionOf, siteRule, setSiteRule, scheduleOn,
     palette, tone, matrix, mapColor, preimage,

@@ -936,8 +936,7 @@
       if (!theme) return;
       api.storage.local.get('cfg').then(function (d) {
         const next = NR.normalize(d && d.cfg);
-        next.theme = 'custom';
-        next.custom = theme.custom;
+        next.theme = NR.addMine(next, { name: theme.name, bg: theme.custom.bg, fg: theme.custom.fg, accent: theme.custom.accent });
         next.brightness = theme.brightness; next.contrast = theme.contrast; next.sepia = theme.sepia; next.gray = theme.gray;
         return api.storage.local.set({ cfg: next });
       }).then(function () { doc.documentElement.setAttribute('data-shuteye-applied', theme.name); })

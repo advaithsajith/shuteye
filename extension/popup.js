@@ -153,40 +153,52 @@
       const rule = cfg.sites[ruleKey()] || {};
       setSiteMode(rule.mode || 'auto');
       setSiteImages(rule.images || 'default');
-      $('siteTheme').value = rule.theme || '';
+      fillSiteThemes(rule.theme);
     }
 
     // A site can wear its own theme, whatever the theme is everywhere else.
-    (function () {
+    function fillSiteThemes(current) {
       const pick = $('siteTheme');
+      pick.textContent = '';
       const option = function (value, label) { const o = document.createElement('option'); o.value = value; o.textContent = label; pick.appendChild(o); };
       option('', 'Same as everywhere');
+      cfg.mine.forEach(function (t) { option(t.id, t.name + ' (mine)'); });
       U.THEMES.forEach(function (t) { option(t.id, t.name); });
       option('custom', 'Custom');
-      pick.addEventListener('change', function () {
-        U.setSiteRule(cfg, ruleKey(), { theme: pick.value || null });
-        renderAll(); save();
-      });
-    })();
+      pick.value = current || '';
+    }
+    $('siteTheme').addEventListener('change', function () {
+      U.setSiteRule(cfg, ruleKey(), { theme: $('siteTheme').value || null });
+      renderAll(); save();
+    });
 
     $('readBtn').addEventListener('click', function () { env.read(tab); });
 
     /* ---------- Themes ---------- */
 
-    function buildThemes() {
+    let tilesFor = null;
+    // The grid shows your saved themes first, then the built-in ones, then the Custom slot.
+    function buildTiles() {
       const box = $('themes');
-      const tiles = U.THEMES.concat([{ id: 'custom', name: 'Custom' }]);
+      box.textContent = '';
+      const tiles = cfg.mine.map(function (m) { return { id: m.id, name: m.name, mine: true }; })
+        .concat(U.THEMES, [{ id: 'custom', name: 'Custom' }]);
       tiles.forEach(function (t) {
         const b = document.createElement('button');
         b.type = 'button';
         b.className = 'theme';
         b.setAttribute('data-theme', t.id);
         b.title = t.note || t.name;
-        env.html(b, '<span class="aa">Aa</span><span class="bar"></span><span class="name"></span>');
+        env.html(b, '<span class="aa">Aa</span><span class="bar"></span>' + (t.mine ? '<span class="mine">mine</span>' : '') + '<span class="name"></span>');
         b.querySelector('.name').textContent = t.name;
         box.appendChild(b);
       });
-      box.addEventListener('click', function (e) {
+      tilesFor = JSON.stringify(cfg.mine);
+    }
+
+    function buildThemes() {
+      buildTiles();
+      $('themes').addEventListener('click', function (e) {
         const b = e.target.closest('.theme');
         if (!b) return;
         const id = b.getAttribute('data-theme');
@@ -199,21 +211,54 @@
     }
 
     function renderThemes() {
+      if (tilesFor !== JSON.stringify(cfg.mine)) buildTiles();
       env.root.querySelectorAll('.theme').forEach(function (b) {
         const id = b.getAttribute('data-theme');
-        const t = id === 'custom' ? cfg.custom : U.themeById(id);
+        const t = U.findTheme(cfg, id);
+        if (!t) return;
         b.style.background = t.bg;
         b.style.color = t.fg;
         b.querySelector('.bar').style.background = t.accent;
         b.setAttribute('aria-pressed', cfg.theme === id ? 'true' : 'false');
       });
       const p = U.palette(cfg), t = U.themeById(cfg.theme);
-      $('themeName').textContent = t && t.note ? t.note : p.name;
+      const saved = cfg.mine.some(function (m) { return m.id === cfg.theme; });
+      $('themeName').textContent = t && t.note ? t.note : (saved ? 'One of yours' : p.name);
       $('customBox').hidden = cfg.theme !== 'custom';
+      $('mineForm').hidden = cfg.theme !== 'custom';
+      $('mineDelete').hidden = !saved;
       $('cBg').value = cfg.custom.bg;
       $('cFg').value = cfg.custom.fg;
       $('cAccent').value = cfg.custom.accent;
     }
+
+    // My themes: keep a custom look under a name, as many as you like.
+    $('mineForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+      const name = $('mineName').value.trim() || 'My theme ' + (cfg.mine.length + 1);
+      cfg.theme = U.addMine(cfg, { name: name, bg: cfg.custom.bg, fg: cfg.custom.fg, accent: cfg.custom.accent });
+      $('mineName').value = '';
+      renderAll(); save();
+    });
+    $('mineDelete').addEventListener('click', function () {
+      U.removeMine(cfg, cfg.theme);
+      renderAll(); save();
+    });
+
+    // Add a theme someone shared, from its link or just the code at the end of it.
+    $('importForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+      const raw = $('importCode').value.trim(), status = $('importStatus');
+      const m = /theme=([A-Za-z0-9_-]+)/.exec(raw);
+      const theme = U.readThemeCode(m ? m[1] : raw);
+      status.hidden = false;
+      if (!theme) { status.textContent = "That doesn't look like a ShutEye theme link."; return; }
+      cfg.theme = U.addMine(cfg, { name: theme.name, bg: theme.custom.bg, fg: theme.custom.fg, accent: theme.custom.accent });
+      cfg.brightness = theme.brightness; cfg.contrast = theme.contrast; cfg.sepia = theme.sepia; cfg.gray = theme.gray;
+      $('importCode').value = '';
+      status.textContent = 'Added "' + theme.name + '" to your themes.';
+      renderAll(); save();
+    });
 
     [['cBg', 'bg'], ['cFg', 'fg'], ['cAccent', 'accent']].forEach(function (pair) {
       $(pair[0]).addEventListener('input', function (e) {
@@ -320,7 +365,7 @@
         const r = cfg.sites[h], bits = [];
         if (r.mode) bits.push(r.mode === 'on' ? 'Always' : 'Never');
         if (r.images) bits.push(r.images === 'natural' ? 'Natural images' : 'Dark images');
-        if (r.theme) bits.push(r.theme === 'custom' ? 'Custom theme' : (U.themeById(r.theme) || {}).name);
+        if (r.theme) bits.push((U.findTheme(cfg, r.theme) || { name: 'Theme' }).name);
         const li = document.createElement('li');
         const name = document.createElement('span'); name.className = 'host'; name.textContent = h;
         const tag = document.createElement('span'); tag.className = 'tag'; tag.textContent = bits.join(' · ');
@@ -337,6 +382,48 @@
 
     $('pdfBtn').addEventListener('click', function () { env.openReader(tab && tab.url, cfg); });
     $('readerBtn').addEventListener('click', function () { env.openReader('', cfg); });
+
+    /* ---------- Backup ---------- */
+
+    function backupNote(text) { const s = $('backupStatus'); s.hidden = false; s.textContent = text; }
+
+    $('backupSave').addEventListener('click', function () {
+      const text = JSON.stringify({ app: 'ShutEye', saved: new Date().toISOString().slice(0, 10), cfg: cfg }, null, 1);
+      $('backupText').value = text;
+      try {
+        const url = URL.createObjectURL(new Blob([text], { type: 'application/json' }));
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'shuteye-backup.json';
+        (env.root.body || env.wrap).appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(function () { URL.revokeObjectURL(url); }, 30000);
+        backupNote('Backup saved as shuteye-backup.json. The same text is in the box above if you would rather copy it.');
+      } catch (e) {
+        backupNote('Copy the text in the box above and keep it somewhere safe.');
+      }
+    });
+
+    function restore(text) {
+      let data;
+      try { data = JSON.parse(text); } catch (e) { backupNote("That isn't a ShutEye backup."); return; }
+      const incoming = data && typeof data === 'object' ? (data.cfg || data) : null;
+      if (!incoming || typeof incoming !== 'object' || (!('theme' in incoming) && !('sites' in incoming))) { backupNote("That isn't a ShutEye backup."); return; }
+      cfg = U.normalize(incoming);
+      renderAll(); save();
+      backupNote('Restored: ' + cfg.mine.length + ' saved theme' + (cfg.mine.length === 1 ? '' : 's') + ' and ' + Object.keys(cfg.sites).length + ' site rule' + (Object.keys(cfg.sites).length === 1 ? '' : 's') + '.');
+    }
+    $('backupLoad').addEventListener('click', function () { $('backupFile').click(); });
+    $('backupFile').addEventListener('change', function (e) {
+      const file = e.target.files[0];
+      e.target.value = '';
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function () { restore(String(reader.result)); };
+      reader.readAsText(file);
+    });
+    $('backupPaste').addEventListener('click', function () { restore($('backupText').value); });
 
     /* ---------- Render ---------- */
 

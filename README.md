@@ -37,7 +37,9 @@ switch it off.
 
 - **Darkens any website**, including long Wikipedia articles, while keeping photos and video in their real colours.
 - **Tells pictures apart.** Diagrams, formulas, line art and scanned book pages go dark with the page. Photos stay natural.
-- **15 themes**: Midnight (true black for OLED), Graphite, Ember (warm sepia), Dracula, Monokai, Nord, Tokyo Night, Catppuccin, Gruvbox, Solarized, One Dark, Rosé Pine, Synthwave, Phosphor, and **Custom** (pick your own background, text and accent colours).
+- **25 themes**: Midnight (true black for OLED), Graphite, Ember, Dracula, Monokai, Nord, Tokyo Night, Catppuccin, Gruvbox, Solarized, One Dark, Rosé Pine, Synthwave, Phosphor, Ayu Dark, Night Owl, Everforest, Kanagawa, Material Ocean, GitHub Dark, Cobalt, Paper Night, Ink, Moss and High Contrast.
+- **My themes**: design your own with three colours, save as many as you like under a name, and use them on any site. Add a theme someone shared by pasting its link.
+- **Backup**: save all settings, themes and site rules to a file and restore them on another device.
 - **Fine-tuning**: brightness, contrast and warmth sliders, photo dimming for bright pictures at night, and an option to paint links in the theme's accent colour.
 - **Switch animations**: Blink (the page shuts like an eyelid), Ripple, Fade, Curtain, Mist, or off. You set the speed.
 - **Per-site rules**: Auto, Always or Never for each site, or for one section of a site (Google Docs but not Sheets), plus a mode that only darkens sites you pick.

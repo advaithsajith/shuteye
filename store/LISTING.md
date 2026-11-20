@@ -40,8 +40,9 @@ WHAT IT DOES
 • Leaves sites alone that are already dark, and keeps dark headers and code boxes dark instead of flipping them to white.
 
 MAKE IT YOURS
-• 15 themes: Midnight (true black for OLED), Graphite, Ember (warm sepia), Dracula, Monokai, Nord, Tokyo Night, Catppuccin, Gruvbox, Solarized, One Dark, Rosé Pine, Synthwave and Phosphor.
-• Custom theme: pick your own background, text and accent colours.
+• 25 themes, including Midnight (true black for OLED), Dracula, Monokai, Nord, Tokyo Night, Catppuccin, Gruvbox, Solarized, Night Owl, Everforest, GitHub Dark and a High Contrast theme for low vision.
+• My themes: design your own with three colours, save as many as you like, and add themes other people share.
+• Backup: save all your settings, themes and site rules to a file and restore them anywhere.
 • Fine-tune brightness, contrast and warmth, and dim bright photos for late-night reading.
 • Choose how pages switch: Blink, Ripple, Fade, Curtain or Mist.
 
@@ -183,7 +184,7 @@ https://advaithsajith.github.io/shuteye/privacy/
   Expect it to take from a few days up to a few weeks.
 - The most common reason for rejection is a description that does not match
   what the extension does, or a permission without a clear reason. The text
-  above was written to match the code as it stands at version 1.3.0.
+  above was written to match the code as it stands at version 1.4.0.
 - If Google asks why ShutEye needs every site, the host permission
   justification above is the answer to send.
 
